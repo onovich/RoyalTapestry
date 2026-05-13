@@ -116,6 +116,11 @@ button {
   text-align: center;
 }
 
+.combo-notice {
+  animation: combo-pop 420ms ease-out;
+  box-shadow: 0 0 1rem rgba(251, 191, 36, 0.22);
+}
+
 .play-area {
   flex: 1;
   min-height: 0;
@@ -206,6 +211,7 @@ button {
 .cell-highlighted {
   outline: 0.2rem solid rgba(251, 191, 36, 0.72);
   outline-offset: 0.08rem;
+  animation: combo-cell-flash 700ms ease-in-out 2;
 }
 
 .row-scores,
@@ -448,6 +454,32 @@ button {
 
 .win-panel {
   text-align: center;
+}
+
+@keyframes combo-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(-0.4rem) scale(0.94);
+  }
+
+  70% {
+    transform: translateY(0) scale(1.04);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes combo-cell-flash {
+  0%, 100% {
+    box-shadow: none;
+  }
+
+  50% {
+    box-shadow: 0 0 1.15rem rgba(251, 191, 36, 0.62);
+  }
 }
 
 @media (max-width: 520px) {

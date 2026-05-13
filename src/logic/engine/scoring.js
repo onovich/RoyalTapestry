@@ -78,6 +78,12 @@ export function scoreGrid(grid) {
   };
 }
 
+export function getScoringLinesForCell(lines, row, column) {
+  return lines.filter((line) =>
+    line.result.score > 0 && line.cells.some((cell) => cell.row === row && cell.column === column)
+  );
+}
+
 export function makeEmptyGrid() {
   return Array.from({ length: BOARD_SIZE }, () => Array.from({ length: BOARD_SIZE }, () => null));
 }

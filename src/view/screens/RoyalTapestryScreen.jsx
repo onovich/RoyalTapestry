@@ -40,6 +40,8 @@ export function RoyalTapestryScreen() {
 
     if (game.selectedCard) {
       game.placeCard(source);
+    } else if (source.type === 'grid' && game.confirmCellCombos(source.row, source.column)) {
+      return;
     } else {
       game.selectCard(source);
     }
@@ -175,9 +177,9 @@ export function RoyalTapestryScreen() {
       <section className="play-area">
         <div className="board-column">
           <div className="status-line">
-            {game.highlight ? (
-              <button type="button" onClick={game.clearSelection}>
-                {text.hands[game.highlight.result.id].name} +{game.highlight.result.score}
+            {game.comboNotice ? (
+              <button className="combo-notice" type="button" onClick={game.clearSelection}>
+                {text.hands[game.comboNotice.result.id].name} +{game.comboNotice.result.score}
               </button>
             ) : game.selectedCard ? (
               <button type="button" onClick={game.clearSelection}>{text.selectDestination}</button>
