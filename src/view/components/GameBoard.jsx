@@ -1,7 +1,17 @@
 import { BOARD_SIZE } from '../../data/cards.js';
 import { Card } from './Card.jsx';
 
-export function GameBoard({ grid, scoring, selectedCard, highlight, onCellClick, onCardClick, onLineClick }) {
+export function GameBoard({
+  grid,
+  scoring,
+  selectedCard,
+  highlight,
+  dragSource,
+  onCellClick,
+  onCardClick,
+  onCardPointerDown,
+  onLineClick
+}) {
   const highlightedCells = new Set((highlight?.cells || []).map((cell) => `${cell.row}-${cell.column}`));
   const rowLines = scoring.lines.filter((line) => line.type === 'row');
   const columnLines = scoring.lines.filter((line) => line.type === 'column');
@@ -39,6 +49,9 @@ export function GameBoard({ grid, scoring, selectedCard, highlight, onCellClick,
               return (
                 <div
                   className={`board-cell ${isHighlighted ? 'cell-highlighted' : ''}`}
+                  data-drop-target="grid"
+                  data-row={rowIndex}
+                  data-column={columnIndex}
                   key={`${rowIndex}-${columnIndex}`}
                   onClick={() => (card ? onCardClick({ type: 'grid', row: rowIndex, column: columnIndex }) : onCellClick({ type: 'grid', row: rowIndex, column: columnIndex }))}
                   onKeyDown={(event) => handleCellKeyDown(event, card, rowIndex, columnIndex)}
@@ -46,7 +59,13 @@ export function GameBoard({ grid, scoring, selectedCard, highlight, onCellClick,
                   tabIndex={0}
                   aria-label={`Board cell ${rowIndex + 1}, ${columnIndex + 1}`}
                 >
-                  <Card card={card} selected={isSelected} onClick={() => onCardClick({ type: 'grid', row: rowIndex, column: columnIndex })} />
+                  <Card
+                    card={card}
+                    selected={isSelected}
+                    muted={dragSource?.type === 'grid' && dragSource.row === rowIndex && dragSource.column === columnIndex}
+                    onClick={() => onCardClick({ type: 'grid', row: rowIndex, column: columnIndex })}
+                    onPointerDown={(event) => onCardPointerDown?.(event, { type: 'grid', row: rowIndex, column: columnIndex })}
+                  />
                 </div>
               );
             })

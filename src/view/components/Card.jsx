@@ -1,4 +1,4 @@
-export function Card({ card, selected = false, muted = false, onClick, onDoubleClick }) {
+export function Card({ card, selected = false, muted = false, onClick, onDoubleClick, onPointerDown }) {
   if (!card) return null;
 
   function handleClick(event) {
@@ -21,6 +21,7 @@ export function Card({ card, selected = false, muted = false, onClick, onDoubleC
       ].join(' ')}
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
+      onPointerDown={onPointerDown}
       type="button"
       aria-label={`${card.rank} of ${card.suit}`}
     >

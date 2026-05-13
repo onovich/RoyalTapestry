@@ -35,6 +35,11 @@ button {
     linear-gradient(160deg, #063f3a 0%, #065f46 48%, #0f3b36 100%);
 }
 
+.app-shell.is-dragging,
+.app-shell.is-dragging * {
+  cursor: grabbing;
+}
+
 .topbar {
   display: flex;
   align-items: end;
@@ -183,6 +188,11 @@ button {
   background: rgba(6, 95, 70, 0.82);
 }
 
+.is-dragging .board-cell:hover {
+  outline: 0.2rem solid rgba(251, 191, 36, 0.55);
+  outline-offset: 0.08rem;
+}
+
 .board-cell:focus-visible,
 .card:focus-visible,
 .line-score:focus-visible,
@@ -256,6 +266,8 @@ button {
   cursor: pointer;
   touch-action: none;
   user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   transition: transform 140ms ease, box-shadow 140ms ease, outline-color 140ms ease;
 }
 
@@ -279,7 +291,7 @@ button {
 }
 
 .card-muted {
-  opacity: 0.4;
+  opacity: 0.35;
 }
 
 .card-rank {
@@ -302,6 +314,32 @@ button {
   border-top: 1px solid rgba(167, 243, 208, 0.18);
   background: rgba(6, 78, 59, 0.94);
   box-shadow: 0 -0.7rem 1.8rem rgba(2, 6, 23, 0.2);
+}
+
+.is-dragging .hand-tray:hover {
+  border-color: rgba(252, 211, 77, 0.44);
+}
+
+.drag-ghost {
+  position: fixed;
+  z-index: 30;
+  width: 4.8rem;
+  height: 4.8rem;
+  pointer-events: none;
+  transform: translate(-50%, -50%) rotate(2deg);
+  filter: drop-shadow(0 1rem 1.2rem rgba(2, 6, 23, 0.38));
+}
+
+.drag-ghost-card {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: grid;
+  place-items: center;
+  border: 1px solid #fde68a;
+  border-radius: 0.55rem;
+  background: #fffaf0;
+  color: #111827;
 }
 
 .side-panel {
