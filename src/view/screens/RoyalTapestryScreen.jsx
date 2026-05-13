@@ -24,6 +24,8 @@ export function RoyalTapestryScreen() {
   }
 
   function handleCardClick(source) {
+    if (game.surrendered) return;
+
     if (suppressClickRef.current) {
       suppressClickRef.current = false;
       return;
@@ -37,6 +39,7 @@ export function RoyalTapestryScreen() {
   }
 
   function handleHandDoubleClick() {
+    if (game.surrendered) return;
     game.clearSelection();
   }
 
@@ -47,6 +50,7 @@ export function RoyalTapestryScreen() {
   }
 
   function handleCardPointerDown(event, source) {
+    if (game.surrendered) return;
     if (event.button !== undefined && event.button !== 0) return;
 
     const card = getCardAtSource(source);
@@ -137,7 +141,7 @@ export function RoyalTapestryScreen() {
 
   return (
     <main
-      className={`app-shell ${dragInfo?.isDragging ? 'is-dragging' : ''}`}
+      className={`app-shell ${dragInfo?.isDragging ? 'is-dragging' : ''} ${game.surrendered ? 'is-surrendered' : ''}`}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerCancel}
@@ -149,6 +153,7 @@ export function RoyalTapestryScreen() {
           <div className="toolbar">
             <button type="button" onClick={game.restart}>{text.newGame}</button>
             <button type="button" onClick={() => setRulesOpen(true)}>{text.rules}</button>
+            <button type="button" onClick={game.surrender} disabled={game.surrendered}>{text.surrender}</button>
             <button type="button" className="language-toggle" onClick={toggleLanguage}>
               {LANGUAGES[language === 'zh' ? 'en' : 'zh']}
             </button>
@@ -173,7 +178,9 @@ export function RoyalTapestryScreen() {
       <section className="play-area">
         <div className="board-column">
           <div className="status-line">
-            {game.comboNotice ? (
+            {game.surrendered ? (
+              <span className="surrender-message">{text.statusSurrendered}</span>
+            ) : game.comboNotice ? (
               <button className="combo-notice" type="button" onClick={game.clearSelection}>
                 <span>✨ {text.hands[game.comboNotice.result.id].name}</span>
                 <strong className="combo-score-badge">+{game.comboNotice.result.score}</strong>
@@ -197,7 +204,7 @@ export function RoyalTapestryScreen() {
             onCellClick={game.clearSelection}
             onCardClick={handleCardClick}
             onCardPointerDown={handleCardPointerDown}
-            onLineClick={game.showLine}
+            onLineClick={game.surrendered ? () => {} : game.showLine}
           />
         </div>
 

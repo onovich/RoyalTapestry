@@ -1,14 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { BOARD_SIZE } from '../../data/cards.js';
 import { createDeck, shuffleArray } from '../engine/deck.js';
-import { estimateMaxScore, getScoringLinesForCell, makeEmptyGrid, scoreGrid } from '../engine/scoring.js';
+import { findBestScoredGrid, getScoringLinesForCell, makeEmptyGrid, scoreGrid } from '../engine/scoring.js';
 
 function drawLevel() {
   const cards = shuffleArray(createDeck()).slice(0, BOARD_SIZE * BOARD_SIZE);
+  const solution = findBestScoredGrid(cards);
   return {
     hand: cards,
     grid: makeEmptyGrid(),
-    targetScore: estimateMaxScore(cards)
+    targetScore: solution.score,
+    solutionGrid: solution.grid,
+    surrendered: false
   };
 }
 
@@ -69,7 +72,7 @@ export function useRoyalTapestryGame() {
   const noticeTimerRef = useRef(null);
   const highlightTimerRef = useRef(null);
   const scoring = useMemo(() => scoreGrid(round.grid), [round.grid]);
-  const isComplete = round.hand.length === 0 && scoring.totalScore >= round.targetScore;
+  const isComplete = !round.surrendered && round.hand.length === 0 && scoring.totalScore >= round.targetScore;
 
   function triggerComboFeedback(line, { resetCycle = false } = {}) {
     setHighlight(line);
@@ -88,6 +91,8 @@ export function useRoyalTapestryGame() {
   }
 
   useEffect(() => {
+    if (round.surrendered) return undefined;
+
     const previousScores = previousLineScoresRef.current;
     const newLine = scoring.lines.find((line) => {
       const previousScore = previousScores[line.id] || 0;
@@ -103,7 +108,7 @@ export function useRoyalTapestryGame() {
     triggerComboFeedback(newLine, { resetCycle: true });
 
     return undefined;
-  }, [scoring]);
+  }, [scoring, round.surrendered]);
 
   function startLevel(nextLevel = 1) {
     setLevel(nextLevel);
@@ -134,6 +139,7 @@ export function useRoyalTapestryGame() {
   }
 
   function placeCard(target) {
+    if (round.surrendered) return;
     if (!selectedCard) return;
     const moved = moveCard({ source: selectedCard, target, hand: round.hand, grid: round.grid });
     setRound((current) => ({ ...current, hand: moved.hand, grid: moved.grid }));
@@ -141,16 +147,32 @@ export function useRoyalTapestryGame() {
   }
 
   function moveDirectly(source, target) {
+    if (round.surrendered) return;
     const moved = moveCard({ source, target, hand: round.hand, grid: round.grid });
     setRound((current) => ({ ...current, hand: moved.hand, grid: moved.grid }));
     setSelectedCard(null);
   }
 
+  function surrender() {
+    setRound((current) => ({
+      ...current,
+      hand: [],
+      grid: current.solutionGrid,
+      surrendered: true
+    }));
+    setSelectedCard(null);
+    setHighlight(null);
+    setComboNotice(null);
+    previousLineScoresRef.current = {};
+  }
+
   function showLine(line) {
+    if (round.surrendered) return;
     triggerComboFeedback(line);
   }
 
   function confirmCellCombos(row, column) {
+    if (round.surrendered) return false;
     const combos = getScoringLinesForCell(scoring.lines, row, column);
     if (combos.length === 0) return false;
 
@@ -172,12 +194,14 @@ export function useRoyalTapestryGame() {
     highlight,
     comboNotice,
     isComplete,
+    surrendered: round.surrendered,
     restart,
     nextLevel,
     selectCard,
     clearSelection,
     placeCard,
     moveDirectly,
+    surrender,
     showLine,
     confirmCellCombos
   };

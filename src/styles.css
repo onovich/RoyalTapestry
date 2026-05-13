@@ -74,6 +74,11 @@ button {
   cursor: pointer;
 }
 
+.toolbar button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
 .toolbar button:hover,
 .status-line button:hover,
 .win-panel button:hover,
@@ -133,6 +138,18 @@ button {
 .need-adjust {
   color: #fcd34d;
   animation: status-pulse 1.2s ease-in-out infinite;
+}
+
+.surrender-message {
+  color: #fecaca;
+}
+
+.is-surrendered .board-cell,
+.is-surrendered .card,
+.is-surrendered .line-score,
+.is-surrendered .score-pill,
+.is-surrendered .hand-tray {
+  cursor: default;
 }
 
 .play-area {

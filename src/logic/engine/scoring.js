@@ -98,8 +98,9 @@ export function flattenGrid(grid) {
   return grid.flat();
 }
 
-export function estimateMaxScore(cards) {
-  let bestScore = scoreGrid(gridFromCards(cards)).totalScore;
+export function findBestScoredGrid(cards) {
+  let bestCards = [...cards];
+  let bestScore = scoreGrid(gridFromCards(bestCards)).totalScore;
 
   for (let restart = 0; restart < TARGET_SEARCH_RESTARTS; restart += 1) {
     const candidate = shuffleArray(cards);
@@ -118,8 +119,18 @@ export function estimateMaxScore(cards) {
       }
     }
 
-    bestScore = Math.max(bestScore, candidateScore);
+    if (candidateScore > bestScore) {
+      bestScore = candidateScore;
+      bestCards = [...candidate];
+    }
   }
 
-  return bestScore;
+  return {
+    score: bestScore,
+    grid: gridFromCards(bestCards)
+  };
+}
+
+export function estimateMaxScore(cards) {
+  return findBestScoredGrid(cards).score;
 }
