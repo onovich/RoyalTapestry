@@ -4,6 +4,7 @@ import { Card } from './Card.jsx';
 export function HandTray({
   hand,
   selectedCard,
+  hint,
   dragSource,
   text,
   onCardClick,
@@ -28,6 +29,13 @@ export function HandTray({
     return () => container.removeEventListener('scroll', handleScroll);
   }, [hand.length]);
 
+  useEffect(() => {
+    if (hint?.source?.type !== 'hand') return;
+    const page = Math.floor(hint.source.index / 5);
+    setCurrentPage(page);
+    scrollToPage(page);
+  }, [hint?.source?.type, hint?.source?.index]);
+
   function scrollToPage(page) {
     if (!scrollRef.current) return;
     scrollRef.current.scrollTo({
@@ -44,7 +52,10 @@ export function HandTray({
         <>
           <div className="hand-scroll" ref={scrollRef}>
             {hand.map((card, index) => (
-              <div className="hand-card" key={card.id}>
+              <div
+                className={`hand-card ${hint?.source?.type === 'hand' && hint.source.index === index ? 'hint-source' : ''}`}
+                key={card.id}
+              >
                 <Card
                   card={card}
                   selected={selectedCard?.type === 'hand' && selectedCard.index === index}

@@ -58,12 +58,87 @@ function moveCard({ source, target, hand, grid }) {
   };
 }
 
+function sameCell(first, second) {
+  return first?.type === second?.type
+    && first?.row === second?.row
+    && first?.column === second?.column
+    && first?.index === second?.index;
+}
+
+function getCardFromSource(source, hand, grid) {
+  if (source.type === 'hand') return hand[source.index];
+  return grid[source.row]?.[source.column];
+}
+
+function scoreMovePotential({ move, moved, currentScore }) {
+  const nextScoring = scoreGrid(moved.grid);
+  const delta = nextScoring.totalScore - currentScore;
+  const affectedLines = nextScoring.lines.filter((line) =>
+    line.cells.some((cell) => cell.row === move.target.row && cell.column === move.target.column)
+  );
+  const potential = affectedLines.reduce((sum, line) => {
+    const filledCards = line.cards.filter(Boolean);
+    const rankMatches = Math.max(
+      0,
+      ...filledCards.map((card) => filledCards.filter((other) => other.rank === card.rank).length)
+    );
+    const suitMatches = Math.max(
+      0,
+      ...filledCards.map((card) => filledCards.filter((other) => other.suit === card.suit).length)
+    );
+    return sum + (line.result.score * 10) + (filledCards.length * 4) + (rankMatches * 3) + suitMatches;
+  }, 0);
+
+  return { delta, nextScore: nextScoring.totalScore, potential };
+}
+
+function findHint({ hand, grid, scoring }) {
+  const sources = [
+    ...hand.map((card, index) => ({ type: 'hand', index })),
+    ...grid.flatMap((row, rowIndex) =>
+      row.map((card, columnIndex) => (card ? { type: 'grid', row: rowIndex, column: columnIndex } : null))
+    ).filter(Boolean)
+  ];
+  const targets = grid.flatMap((row, rowIndex) =>
+    row.map((card, columnIndex) => ({ type: 'grid', row: rowIndex, column: columnIndex }))
+  );
+  const candidates = [];
+
+  for (const source of sources) {
+    for (const target of targets) {
+      if (sameCell(source, target)) continue;
+      const moved = moveCard({ source, target, hand, grid });
+      const sourceCard = getCardFromSource(source, hand, grid);
+      const targetCard = getCardFromSource(target, hand, grid);
+      const unchanged = moved.hand === hand && moved.grid === grid;
+      if (!sourceCard || unchanged) continue;
+
+      candidates.push({
+        source,
+        target,
+        sourceCard,
+        targetCard,
+        ...scoreMovePotential({ move: { source, target }, moved, currentScore: scoring.totalScore })
+      });
+    }
+  }
+
+  const usefulCandidates = candidates.filter((candidate) => candidate.delta >= 0);
+  if (usefulCandidates.length === 0) return null;
+  return usefulCandidates.sort((first, second) =>
+    (second.delta - first.delta)
+    || (second.potential - first.potential)
+    || (first.source.type === 'hand' ? -1 : 1)
+  )[0];
+}
+
 export function useRoyalTapestryGame() {
   const [level, setLevel] = useState(1);
   const [round, setRound] = useState(() => drawLevel());
   const [selectedCard, setSelectedCard] = useState(null);
   const [highlight, setHighlight] = useState(null);
   const [comboNotice, setComboNotice] = useState(null);
+  const [hintNotice, setHintNotice] = useState(null);
   const [comboCycle, setComboCycle] = useState({ key: '', index: 0 });
   const previousLineScoresRef = useRef({});
   const noticeTimerRef = useRef(null);
@@ -111,6 +186,7 @@ export function useRoyalTapestryGame() {
     setSelectedCard(null);
     setHighlight(null);
     setComboNotice(null);
+    setHintNotice(null);
     setComboCycle({ key: '', index: 0 });
     previousLineScoresRef.current = {};
     if (noticeTimerRef.current) clearTimeout(noticeTimerRef.current);
@@ -138,12 +214,14 @@ export function useRoyalTapestryGame() {
     const moved = moveCard({ source: selectedCard, target, hand: round.hand, grid: round.grid });
     setRound((current) => ({ ...current, hand: moved.hand, grid: moved.grid }));
     setSelectedCard(null);
+    setHintNotice(null);
   }
 
   function moveDirectly(source, target) {
     const moved = moveCard({ source, target, hand: round.hand, grid: round.grid });
     setRound((current) => ({ ...current, hand: moved.hand, grid: moved.grid }));
     setSelectedCard(null);
+    setHintNotice(null);
   }
 
   function showLine(line) {
@@ -162,6 +240,11 @@ export function useRoyalTapestryGame() {
     return true;
   }
 
+  function requestHint() {
+    setSelectedCard(null);
+    setHintNotice(findHint({ hand: round.hand, grid: round.grid, scoring }));
+  }
+
   return {
     level,
     hand: round.hand,
@@ -171,6 +254,7 @@ export function useRoyalTapestryGame() {
     scoring,
     highlight,
     comboNotice,
+    hintNotice,
     isComplete,
     restart,
     nextLevel,
@@ -179,6 +263,7 @@ export function useRoyalTapestryGame() {
     placeCard,
     moveDirectly,
     showLine,
-    confirmCellCombos
+    confirmCellCombos,
+    requestHint
   };
 }

@@ -6,6 +6,7 @@ export function GameBoard({
   scoring,
   selectedCard,
   highlight,
+  hint,
   dragSource,
   text,
   onCellClick,
@@ -39,7 +40,8 @@ export function GameBoard({
             type="button"
             onClick={() => onLineClick(line)}
           >
-            {line.index === 0 ? '↘' : '↙'} {line.result.score}
+            <strong>{line.index === 0 ? '↘' : '↙'} {line.result.score}</strong>
+            <span>{line.result.score > 0 ? text.hands[line.result.id].short : '-'}</span>
           </button>
         ))}
       </div>
@@ -51,10 +53,21 @@ export function GameBoard({
                 && selectedCard.row === rowIndex
                 && selectedCard.column === columnIndex;
               const isHighlighted = highlightedCells.has(`${rowIndex}-${columnIndex}`);
+              const isHintSource = hint?.source?.type === 'grid'
+                && hint.source.row === rowIndex
+                && hint.source.column === columnIndex;
+              const isHintTarget = hint?.target?.type === 'grid'
+                && hint.target.row === rowIndex
+                && hint.target.column === columnIndex;
 
               return (
                 <div
-                  className={`board-cell ${isHighlighted ? 'cell-highlighted' : ''}`}
+                  className={[
+                    'board-cell',
+                    isHighlighted ? 'cell-highlighted' : '',
+                    isHintSource ? 'hint-source' : '',
+                    isHintTarget ? 'hint-target' : ''
+                  ].join(' ')}
                   data-drop-target="grid"
                   data-row={rowIndex}
                   data-column={columnIndex}
