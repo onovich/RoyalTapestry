@@ -25,6 +25,7 @@ export function RoyalTapestryScreen() {
 
   function handleCardClick(source) {
     if (game.surrendered) return;
+    if (game.isSourceLocked(source)) return;
 
     if (suppressClickRef.current) {
       suppressClickRef.current = false;
@@ -51,6 +52,7 @@ export function RoyalTapestryScreen() {
 
   function handleCardPointerDown(event, source) {
     if (game.surrendered) return;
+    if (game.isSourceLocked(source)) return;
     if (event.button !== undefined && event.button !== 0) return;
 
     const card = getCardAtSource(source);
@@ -200,12 +202,14 @@ export function RoyalTapestryScreen() {
             scoring={game.scoring}
             selectedCard={game.selectedCard}
             highlight={game.highlight}
+            lockedLineIds={game.lockedLineIds}
+            lockedCells={game.lockedCells}
             dragSource={dragInfo?.source}
             text={text}
             onCellClick={game.clearSelection}
             onCardClick={handleCardClick}
             onCardPointerDown={handleCardPointerDown}
-            onLineClick={game.surrendered ? () => {} : game.showLine}
+            onLineClick={game.surrendered ? () => {} : game.toggleLineLock}
           />
         </div>
 

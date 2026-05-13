@@ -11,7 +11,8 @@ function drawLevel() {
     grid: makeEmptyGrid(),
     targetScore: solution.score,
     solutionGrid: solution.grid,
-    surrendered: false
+    surrendered: false,
+    lockedLines: []
   };
 }
 
@@ -90,6 +91,23 @@ export function useRoyalTapestryGame() {
   const highlightTimerRef = useRef(null);
   const skipScoreFeedbackRef = useRef(false);
   const scoring = useMemo(() => scoreGrid(round.grid), [round.grid]);
+  const lockedLineIds = useMemo(() => new Set(round.lockedLines.map((line) => line.id)), [round.lockedLines]);
+  const lockedCardIds = useMemo(() => {
+    const cardIds = new Set();
+    round.lockedLines.forEach((line) => {
+      line.cardIds.forEach((id) => cardIds.add(id));
+    });
+    return cardIds;
+  }, [round.lockedLines]);
+  const lockedCells = useMemo(() => {
+    const cells = new Set();
+    round.grid.forEach((row, rowIndex) => {
+      row.forEach((card, columnIndex) => {
+        if (card && lockedCardIds.has(card.id)) cells.add(`${rowIndex}-${columnIndex}`);
+      });
+    });
+    return cells;
+  }, [round.grid, lockedCardIds]);
   const isComplete = !round.surrendered && round.hand.length === 0 && scoring.totalScore >= round.targetScore;
 
   function triggerComboFeedback(line, { resetCycle = false } = {}) {
@@ -163,6 +181,12 @@ export function useRoyalTapestryGame() {
     setSelectedCard(null);
   }
 
+  function isSourceLocked(source) {
+    if (source?.type !== 'grid') return false;
+    const card = round.grid[source.row]?.[source.column];
+    return Boolean(card && lockedCardIds.has(card.id));
+  }
+
   function placeCard(target) {
     if (round.surrendered) return;
     if (!selectedCard) return;
@@ -173,6 +197,10 @@ export function useRoyalTapestryGame() {
 
   function moveDirectly(source, target) {
     if (round.surrendered) return;
+    if (isSourceLocked(source) || isSourceLocked(target)) {
+      setSelectedCard(null);
+      return;
+    }
     const moved = moveCard({ source, target, hand: round.hand, grid: round.grid });
     const nextRound = { ...round, hand: moved.hand, grid: moved.grid };
     if (sameRoundPosition(round, nextRound)) {
@@ -200,7 +228,8 @@ export function useRoyalTapestryGame() {
       ...current,
       hand: [],
       grid: current.solutionGrid,
-      surrendered: true
+      surrendered: true,
+      lockedLines: []
     }));
     setSelectedCard(null);
     setHighlight(null);
@@ -216,6 +245,7 @@ export function useRoyalTapestryGame() {
 
   function confirmCellCombos(row, column) {
     if (round.surrendered) return false;
+    if (lockedCells.has(`${row}-${column}`)) return false;
     const combos = getScoringLinesForCell(scoring.lines, row, column);
     if (combos.length === 0) return false;
 
@@ -225,6 +255,25 @@ export function useRoyalTapestryGame() {
     setComboCycle({ key, index: nextIndex });
     triggerComboFeedback(combo);
     return true;
+  }
+
+  function toggleLineLock(line) {
+    if (round.surrendered) return;
+    if (line.result.score <= 0 || line.cards.some((card) => !card)) return;
+
+    setHistory((current) => [...current, round]);
+    setRound((current) => {
+      const isLocked = current.lockedLines.some((lockedLine) => lockedLine.id === line.id);
+      return {
+        ...current,
+        lockedLines: isLocked
+          ? current.lockedLines.filter((lockedLine) => lockedLine.id !== line.id)
+          : [...current.lockedLines, { id: line.id, cardIds: line.cards.map((card) => card.id) }]
+      };
+    });
+    setSelectedCard(null);
+    setHighlight(null);
+    setComboNotice(null);
   }
 
   return {
@@ -238,6 +287,8 @@ export function useRoyalTapestryGame() {
     comboNotice,
     isComplete,
     surrendered: round.surrendered,
+    lockedLineIds,
+    lockedCells,
     canUndo: history.length > 0 && !round.surrendered,
     restart,
     nextLevel,
@@ -248,6 +299,8 @@ export function useRoyalTapestryGame() {
     undo,
     surrender,
     showLine,
-    confirmCellCombos
+    confirmCellCombos,
+    toggleLineLock,
+    isSourceLocked
   };
 }

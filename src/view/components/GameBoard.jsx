@@ -6,6 +6,8 @@ export function GameBoard({
   scoring,
   selectedCard,
   highlight,
+  lockedLineIds,
+  lockedCells,
   dragSource,
   text,
   onCellClick,
@@ -21,6 +23,7 @@ export function GameBoard({
   function handleCellKeyDown(event, card, row, column) {
     if (event.key !== 'Enter' && event.key !== ' ') return;
     event.preventDefault();
+    if (lockedCells?.has(`${row}-${column}`)) return;
 
     if (card) {
       onCardClick({ type: 'grid', row, column });
@@ -35,7 +38,12 @@ export function GameBoard({
         {diagonalLines.map((line) => (
           <button
             key={line.id}
-            className={`score-pill diagonal-pill ${highlight?.id === line.id ? 'line-highlighted' : ''}`}
+            className={[
+              'score-pill',
+              'diagonal-pill',
+              highlight?.id === line.id ? 'line-highlighted' : '',
+              lockedLineIds?.has(line.id) ? 'line-locked' : ''
+            ].join(' ')}
             type="button"
             onClick={() => onLineClick(line)}
           >
@@ -52,15 +60,25 @@ export function GameBoard({
                 && selectedCard.row === rowIndex
                 && selectedCard.column === columnIndex;
               const isHighlighted = highlightedCells.has(`${rowIndex}-${columnIndex}`);
+              const isLocked = lockedCells?.has(`${rowIndex}-${columnIndex}`);
 
               return (
                 <div
-                  className={`board-cell ${isHighlighted ? 'cell-highlighted' : ''}`}
+                  className={[
+                    'board-cell',
+                    isHighlighted ? 'cell-highlighted' : '',
+                    isLocked ? 'cell-locked' : ''
+                  ].join(' ')}
                   data-drop-target="grid"
                   data-row={rowIndex}
                   data-column={columnIndex}
                   key={`${rowIndex}-${columnIndex}`}
-                  onClick={() => (card ? onCardClick({ type: 'grid', row: rowIndex, column: columnIndex }) : onCellClick({ type: 'grid', row: rowIndex, column: columnIndex }))}
+                  onClick={() => {
+                    if (isLocked) return;
+                    return card
+                      ? onCardClick({ type: 'grid', row: rowIndex, column: columnIndex })
+                      : onCellClick({ type: 'grid', row: rowIndex, column: columnIndex });
+                  }}
                   onKeyDown={(event) => handleCellKeyDown(event, card, rowIndex, columnIndex)}
                   role="button"
                   tabIndex={0}
@@ -83,7 +101,11 @@ export function GameBoard({
           {rowLines.map((line) => (
             <button
               key={line.id}
-              className={`line-score ${highlight?.id === line.id ? 'line-highlighted' : ''}`}
+              className={[
+                'line-score',
+                highlight?.id === line.id ? 'line-highlighted' : '',
+                lockedLineIds?.has(line.id) ? 'line-locked' : ''
+              ].join(' ')}
               type="button"
               onClick={() => onLineClick(line)}
             >
@@ -97,7 +119,11 @@ export function GameBoard({
         {columnLines.map((line) => (
           <button
             key={line.id}
-            className={`line-score ${highlight?.id === line.id ? 'line-highlighted' : ''}`}
+            className={[
+              'line-score',
+              highlight?.id === line.id ? 'line-highlighted' : '',
+              lockedLineIds?.has(line.id) ? 'line-locked' : ''
+            ].join(' ')}
             type="button"
             onClick={() => onLineClick(line)}
           >

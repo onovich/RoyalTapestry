@@ -195,6 +195,24 @@ button {
   transform: scale(1.12);
 }
 
+.line-locked {
+  color: #e5e7eb;
+  border-color: rgba(209, 213, 219, 0.8);
+  background: rgba(75, 85, 99, 0.72);
+  box-shadow: inset 0 0 0 0.14rem rgba(209, 213, 219, 0.3);
+}
+
+.line-locked span,
+.line-locked strong {
+  color: #e5e7eb;
+}
+
+.score-pill.line-locked:hover,
+.line-score.line-locked:hover {
+  border-color: rgba(209, 213, 219, 0.86);
+  background: rgba(75, 85, 99, 0.78);
+}
+
 .diagonal-pill {
   min-width: 2.25rem;
   border-radius: 0.35rem;
@@ -268,6 +286,25 @@ button {
   outline: 0.2rem solid rgba(251, 191, 36, 0.72);
   outline-offset: 0.08rem;
   animation: combo-cell-flash 700ms ease-in-out 2;
+}
+
+.cell-locked {
+  border-style: solid;
+  border-color: rgba(209, 213, 219, 0.85);
+  background: rgba(75, 85, 99, 0.34);
+  box-shadow: inset 0 0 0 0.16rem rgba(209, 213, 219, 0.22);
+  cursor: default;
+}
+
+.cell-locked .card {
+  cursor: default;
+  filter: grayscale(0.45);
+  box-shadow: none;
+}
+
+.cell-locked:hover {
+  border-color: rgba(209, 213, 219, 0.9);
+  background: rgba(75, 85, 99, 0.38);
 }
 
 .row-scores,
