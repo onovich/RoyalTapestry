@@ -19,6 +19,17 @@ export function RoyalTapestryScreen() {
     document.documentElement.lang = language === 'zh' ? 'zh-CN' : 'en';
   }, [language]);
 
+  useEffect(() => {
+    if (!dragInfo) return undefined;
+
+    const preventTouchMove = (event) => event.preventDefault();
+    document.addEventListener('touchmove', preventTouchMove, { passive: false });
+
+    return () => {
+      document.removeEventListener('touchmove', preventTouchMove);
+    };
+  }, [Boolean(dragInfo)]);
+
   function toggleLanguage() {
     setLanguage((current) => (current === 'zh' ? 'en' : 'zh'));
   }
@@ -54,6 +65,9 @@ export function RoyalTapestryScreen() {
     if (game.surrendered) return;
     if (game.isSourceLocked(source)) return;
     if (event.button !== undefined && event.button !== 0) return;
+
+    event.preventDefault();
+    event.currentTarget.setPointerCapture?.(event.pointerId);
 
     const card = getCardAtSource(source);
     if (!card) return;
