@@ -35,3 +35,46 @@ Suggested priority:
 3. Sequential multi-combo feedback.
 4. Lock/unlock animation and locked-card shake.
 5. Optional sound and vibration settings.
+
+## Chill And Zen Atmosphere
+
+Future design notes only. Do not implement yet.
+
+- Treat the game as a slow tabletop space rather than a high-pressure puzzle.
+- Atmosphere should support the card table, not compete with it.
+- Add a side vinyl record object as a low-key music controller.
+- The record may slowly spin while music is playing and ease to a stop when paused.
+- Consider channels such as rain night, dusk, lo-fi, jazz, tea room, or quiet ambient.
+- Keep music optional, with clear mute and volume controls.
+- Prefer copyright-safe short loops, ambient layers, or synthesized textures.
+- Consider shipping the vinyl UI first even if music content comes later.
+- Add progressive atmosphere based on play state or score thresholds:
+  - 0 score: quiet table, almost no background motion.
+  - 25% target score: subtle table-edge glow or slow light drift.
+  - 50% target score: low-density particles or soft background shimmer.
+  - 75% target score: richer vinyl detail, subtle spectrum movement, or an added ambient layer.
+  - Target reached: gently brighter room, not an arcade celebration.
+  - Surrendered: cooler tone and reduced ambience to reinforce failure state.
+- Avoid repetitive ambience by using parameterized animation:
+  - random particle density, color, speed, and direction;
+  - several light-flow path presets with random phase;
+  - seed-based background variation per level;
+  - layered audio stems that fade in as score improves.
+- Map combo types to subtle ambience accents:
+  - flush: soft color wash;
+  - straight: linear sweep;
+  - full house or stronger: slow warm pulse.
+- Add an idle state: after a period without input, let the room become slightly more alive while keeping cards readable.
+- Add a "Zen Mode" with no target, failure, or pressure: just arrange cards and enjoy combo feedback.
+- Add lightweight unlockables such as records, table cloths, card backs, or room themes.
+- Themes should feel like spaces rather than skins, such as rain window, late-night desk, old cafe, or quiet wood table.
+- Add ambient sounds such as rain, wind, vinyl noise, or cup clinks before adding busy melodies.
+- Auto-save the current table, locks, music state, and ambience state so the player can leave and return later.
+
+Suggested priority:
+
+1. Auto-save current table state.
+2. Vinyl UI with mute and volume controls.
+3. Score-progressive ambience layer.
+4. Idle ambience behavior.
+5. Zen Mode and theme or record collection.
