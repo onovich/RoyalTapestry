@@ -33,8 +33,13 @@ export function GameBoard({
     <section className="board-wrap" aria-label={text.boardLabel}>
       <div className="diagonal-score-row">
         {diagonalLines.map((line) => (
-          <button key={line.id} className="score-pill diagonal-pill" type="button" onClick={() => onLineClick(line)}>
-            {line.result.score}
+          <button
+            key={line.id}
+            className={`score-pill diagonal-pill ${highlight?.id === line.id ? 'line-highlighted' : ''}`}
+            type="button"
+            onClick={() => onLineClick(line)}
+          >
+            {line.index === 0 ? '↘' : '↙'} {line.result.score}
           </button>
         ))}
       </div>
@@ -75,7 +80,12 @@ export function GameBoard({
         </div>
         <div className="row-scores">
           {rowLines.map((line) => (
-            <button key={line.id} className="line-score" type="button" onClick={() => onLineClick(line)}>
+            <button
+              key={line.id}
+              className={`line-score ${highlight?.id === line.id ? 'line-highlighted' : ''}`}
+              type="button"
+              onClick={() => onLineClick(line)}
+            >
               <strong>{line.result.score}</strong>
               <span>{line.result.score > 0 ? text.hands[line.result.id].short : '-'}</span>
             </button>
@@ -84,7 +94,12 @@ export function GameBoard({
       </div>
       <div className="column-scores">
         {columnLines.map((line) => (
-          <button key={line.id} className="line-score" type="button" onClick={() => onLineClick(line)}>
+          <button
+            key={line.id}
+            className={`line-score ${highlight?.id === line.id ? 'line-highlighted' : ''}`}
+            type="button"
+            onClick={() => onLineClick(line)}
+          >
             <strong>{line.result.score}</strong>
             <span>{line.result.score > 0 ? text.hands[line.result.id].short : '-'}</span>
           </button>

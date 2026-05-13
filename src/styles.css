@@ -117,8 +117,21 @@ button {
 }
 
 .combo-notice {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   animation: combo-pop 420ms ease-out;
   box-shadow: 0 0 1rem rgba(251, 191, 36, 0.22);
+}
+
+.combo-score-badge {
+  color: #fbbf24;
+  font-size: 0.9em;
+}
+
+.need-adjust {
+  color: #fcd34d;
+  animation: status-pulse 1.2s ease-in-out infinite;
 }
 
 .play-area {
@@ -155,6 +168,13 @@ button {
 .line-score:hover {
   border-color: rgba(252, 211, 77, 0.5);
   background: rgba(4, 120, 87, 0.72);
+}
+
+.line-highlighted {
+  color: #fff7ed;
+  border-color: rgba(251, 191, 36, 0.75);
+  background: rgba(146, 64, 14, 0.78);
+  transform: scale(1.12);
 }
 
 .diagonal-pill {
@@ -360,14 +380,43 @@ button {
 .hand-scroll {
   display: flex;
   gap: 0.55rem;
-  overflow-x: auto;
+  overflow-x: hidden;
   padding-bottom: 0.3rem;
   scrollbar-width: thin;
+  scroll-behavior: smooth;
 }
 
 .hand-card {
   flex: 0 0 4.25rem;
   aspect-ratio: 1;
+}
+
+.hand-pages {
+  height: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.55rem;
+}
+
+.hand-pages button {
+  min-width: 2rem;
+  height: 1.5rem;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  border-radius: 0.35rem;
+  background: #022c22;
+  color: #6ee7b7;
+  font-size: 0.7rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 140ms ease, background 140ms ease, color 140ms ease;
+}
+
+.hand-pages .hand-page-active {
+  background: #fbbf24;
+  color: #78350f;
+  transform: scale(1.1);
 }
 
 .empty-hand {
@@ -411,6 +460,23 @@ button {
   margin: 0;
 }
 
+.modal-header h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #fef3c7;
+}
+
+.rule-suit {
+  font-size: 1.2em;
+  line-height: 1;
+}
+
+.rule-suit-diamond,
+.rule-suit-heart {
+  color: #ef4444;
+}
+
 .icon-button {
   width: 2rem;
   height: 2rem;
@@ -437,8 +503,16 @@ button {
 }
 
 .rule-row strong {
+  display: grid;
+  place-items: center;
   color: #fbbf24;
   font-size: 1.15rem;
+}
+
+.rule-row strong small {
+  color: #a7f3d0;
+  font-size: 0.62rem;
+  font-weight: 700;
 }
 
 .rule-row h3,
@@ -454,6 +528,56 @@ button {
 
 .win-panel {
   text-align: center;
+}
+
+.win-trophy {
+  margin-bottom: 0.75rem;
+  font-size: 3.8rem;
+  line-height: 1;
+}
+
+.win-panel h2 {
+  color: #fbbf24;
+  font-size: 1.65rem;
+}
+
+.win-panel p {
+  color: #d1fae5;
+  font-size: 0.9rem;
+}
+
+.win-score-box {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.35rem 0;
+  padding: 1rem;
+  border: 1px solid rgba(16, 185, 129, 0.26);
+  border-radius: 0.85rem;
+  background: rgba(2, 44, 34, 0.5);
+}
+
+.win-score-box div:not(.win-score-divider) {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.win-score-box span {
+  color: #6ee7b7;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+}
+
+.win-score-box strong {
+  color: #fbbf24;
+  font-size: 1.65rem;
+}
+
+.win-score-divider {
+  width: 1px;
+  height: 2.75rem;
+  background: rgba(16, 185, 129, 0.35);
 }
 
 @keyframes combo-pop {
@@ -479,6 +603,16 @@ button {
 
   50% {
     box-shadow: 0 0 1.15rem rgba(251, 191, 36, 0.62);
+  }
+}
+
+@keyframes status-pulse {
+  0%, 100% {
+    opacity: 0.72;
+  }
+
+  50% {
+    opacity: 1;
   }
 }
 
@@ -691,6 +825,10 @@ button {
     overflow-y: auto;
     overflow-x: hidden;
     padding: 0 0.25rem 0.25rem 0;
+  }
+
+  .hand-pages {
+    display: none;
   }
 
   .hand-card {

@@ -67,8 +67,25 @@ export function useRoyalTapestryGame() {
   const [comboCycle, setComboCycle] = useState({ key: '', index: 0 });
   const previousLineScoresRef = useRef({});
   const noticeTimerRef = useRef(null);
+  const highlightTimerRef = useRef(null);
   const scoring = useMemo(() => scoreGrid(round.grid), [round.grid]);
   const isComplete = round.hand.length === 0 && scoring.totalScore >= round.targetScore;
+
+  function triggerComboFeedback(line, { resetCycle = false } = {}) {
+    setHighlight(line);
+    setComboNotice(line);
+    if (resetCycle) setComboCycle({ key: '', index: 0 });
+
+    if (noticeTimerRef.current) clearTimeout(noticeTimerRef.current);
+    if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
+
+    highlightTimerRef.current = window.setTimeout(() => {
+      setHighlight(null);
+    }, 900);
+    noticeTimerRef.current = window.setTimeout(() => {
+      setComboNotice(null);
+    }, 1800);
+  }
 
   useEffect(() => {
     const previousScores = previousLineScoresRef.current;
@@ -83,14 +100,7 @@ export function useRoyalTapestryGame() {
 
     if (!newLine) return undefined;
 
-    setHighlight(newLine);
-    setComboNotice(newLine);
-    setComboCycle({ key: '', index: 0 });
-
-    if (noticeTimerRef.current) clearTimeout(noticeTimerRef.current);
-    noticeTimerRef.current = window.setTimeout(() => {
-      setComboNotice(null);
-    }, 1800);
+    triggerComboFeedback(newLine, { resetCycle: true });
 
     return undefined;
   }, [scoring]);
@@ -104,6 +114,7 @@ export function useRoyalTapestryGame() {
     setComboCycle({ key: '', index: 0 });
     previousLineScoresRef.current = {};
     if (noticeTimerRef.current) clearTimeout(noticeTimerRef.current);
+    if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
   }
 
   function restart() {
@@ -136,8 +147,7 @@ export function useRoyalTapestryGame() {
   }
 
   function showLine(line) {
-    setHighlight(line);
-    setComboNotice(line);
+    triggerComboFeedback(line);
   }
 
   function confirmCellCombos(row, column) {
@@ -148,8 +158,7 @@ export function useRoyalTapestryGame() {
     const nextIndex = comboCycle.key === key ? (comboCycle.index + 1) % combos.length : 0;
     const combo = combos[nextIndex];
     setComboCycle({ key, index: nextIndex });
-    setHighlight(combo);
-    setComboNotice(combo);
+    triggerComboFeedback(combo);
     return true;
   }
 

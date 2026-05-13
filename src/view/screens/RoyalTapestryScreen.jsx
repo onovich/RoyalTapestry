@@ -179,10 +179,13 @@ export function RoyalTapestryScreen() {
           <div className="status-line">
             {game.comboNotice ? (
               <button className="combo-notice" type="button" onClick={game.clearSelection}>
-                {text.hands[game.comboNotice.result.id].name} +{game.comboNotice.result.score}
+                <span>✨ {text.hands[game.comboNotice.result.id].name}</span>
+                <strong className="combo-score-badge">+{game.comboNotice.result.score}</strong>
               </button>
             ) : game.selectedCard ? (
               <button type="button" onClick={game.clearSelection}>{text.selectDestination}</button>
+            ) : game.hand.length === 0 && game.scoring.totalScore < game.targetScore ? (
+              <span className="need-adjust">{text.statusNeedAdjust}</span>
             ) : (
               <span>{text.statusDefault}</span>
             )}
@@ -232,8 +235,20 @@ export function RoyalTapestryScreen() {
       {game.isComplete && (
         <div className="modal-backdrop">
           <section className="modal-panel win-panel">
+            <div className="win-trophy">🏆</div>
             <h2>{text.levelComplete}</h2>
             <p>{formatText(text.levelCompleteBody, { level: game.level })}</p>
+            <div className="win-score-box">
+              <div>
+                <span>{text.target}</span>
+                <strong>{game.targetScore}</strong>
+              </div>
+              <div className="win-score-divider" />
+              <div>
+                <span>{text.finalScore}</span>
+                <strong>{game.scoring.totalScore}</strong>
+              </div>
+            </div>
             <button type="button" onClick={game.nextLevel}>{text.nextLevel}</button>
           </section>
         </div>
