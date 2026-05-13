@@ -4,10 +4,12 @@ import { useRoyalTapestryGame } from '../../logic/hooks/useRoyalTapestryGame.js'
 import { GameBoard } from '../components/GameBoard.jsx';
 import { HandTray } from '../components/HandTray.jsx';
 import { RulesModal } from '../components/RulesModal.jsx';
+import { StoryModal } from '../components/StoryModal.jsx';
 
 export function RoyalTapestryScreen() {
   const game = useRoyalTapestryGame();
   const [rulesOpen, setRulesOpen] = useState(false);
+  const [storyOpen, setStoryOpen] = useState(false);
   const [language, setLanguage] = useState(getSystemLanguage);
   const [dragInfo, setDragInfo] = useState(null);
   const dragRef = useRef(null);
@@ -170,6 +172,7 @@ export function RoyalTapestryScreen() {
             <button type="button" onClick={game.restart}>{text.newGame}</button>
             <button type="button" onClick={game.undo} disabled={!game.canUndo}>{text.undo}</button>
             <button type="button" onClick={() => setRulesOpen(true)}>{text.rules}</button>
+            <button type="button" onClick={() => setStoryOpen(true)}>{text.story}</button>
             <button type="button" onClick={game.surrender} disabled={game.surrendered}>{text.surrender}</button>
             <button type="button" className="language-toggle" onClick={toggleLanguage}>
               {LANGUAGES[language === 'zh' ? 'en' : 'zh']}
@@ -277,6 +280,7 @@ export function RoyalTapestryScreen() {
       )}
 
       <RulesModal open={rulesOpen} text={text} onClose={() => setRulesOpen(false)} />
+      <StoryModal open={storyOpen} text={text} onClose={() => setStoryOpen(false)} />
     </main>
   );
 }

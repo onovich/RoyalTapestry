@@ -616,6 +616,18 @@ button {
   font-size: 0.82rem;
 }
 
+.story-panel {
+  width: min(92vw, 28rem);
+}
+
+.story-text {
+  margin: 0;
+  color: #fef3c7;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  text-align: left;
+}
+
 .win-panel {
   text-align: center;
 }
