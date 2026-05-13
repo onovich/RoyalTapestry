@@ -96,6 +96,12 @@ export function useRoyalTapestryGame() {
     setSelectedCard(null);
   }
 
+  function moveDirectly(source, target) {
+    const moved = moveCard({ source, target, hand: round.hand, grid: round.grid });
+    setRound((current) => ({ ...current, hand: moved.hand, grid: moved.grid }));
+    setSelectedCard(null);
+  }
+
   function showLine(line) {
     setHighlight(line);
   }
@@ -114,6 +120,7 @@ export function useRoyalTapestryGame() {
     selectCard,
     clearSelection,
     placeCard,
+    moveDirectly,
     showLine
   };
 }

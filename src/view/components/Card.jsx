@@ -1,9 +1,14 @@
-export function Card({ card, selected = false, muted = false, onClick }) {
+export function Card({ card, selected = false, muted = false, onClick, onDoubleClick }) {
   if (!card) return null;
 
   function handleClick(event) {
     event.stopPropagation();
     onClick?.(event);
+  }
+
+  function handleDoubleClick(event) {
+    event.stopPropagation();
+    onDoubleClick?.(event);
   }
 
   return (
@@ -15,6 +20,7 @@ export function Card({ card, selected = false, muted = false, onClick }) {
         muted ? 'card-muted' : ''
       ].join(' ')}
       onClick={handleClick}
+      onDoubleClick={handleDoubleClick}
       type="button"
       aria-label={`${card.rank} of ${card.suit}`}
     >

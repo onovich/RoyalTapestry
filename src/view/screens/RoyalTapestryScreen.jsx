@@ -8,12 +8,28 @@ export function RoyalTapestryScreen() {
   const game = useRoyalTapestryGame();
   const [rulesOpen, setRulesOpen] = useState(false);
 
+  function findFirstEmptyCell() {
+    for (let row = 0; row < game.grid.length; row += 1) {
+      for (let column = 0; column < game.grid[row].length; column += 1) {
+        if (!game.grid[row][column]) return { type: 'grid', row, column };
+      }
+    }
+
+    return null;
+  }
+
   function handleCardClick(source) {
     if (game.selectedCard) {
       game.placeCard(source);
     } else {
       game.selectCard(source);
     }
+  }
+
+  function handleHandDoubleClick(source) {
+    const target = findFirstEmptyCell();
+    if (!target) return;
+    game.moveDirectly(source, target);
   }
 
   return (
@@ -42,34 +58,45 @@ export function RoyalTapestryScreen() {
         </div>
       </header>
 
-      <div className="status-line">
-        {game.highlight ? (
-          <button type="button" onClick={game.clearSelection}>
-            {game.highlight.result.name} +{game.highlight.result.score}
-          </button>
-        ) : game.selectedCard ? (
-          <button type="button" onClick={game.clearSelection}>Select a destination</button>
-        ) : (
-          <span>Build scoring poker lines across rows, columns, and diagonals.</span>
-        )}
-      </div>
+      <section className="play-area">
+        <div className="board-column">
+          <div className="status-line">
+            {game.highlight ? (
+              <button type="button" onClick={game.clearSelection}>
+                {game.highlight.result.name} +{game.highlight.result.score}
+              </button>
+            ) : game.selectedCard ? (
+              <button type="button" onClick={game.clearSelection}>Select a destination</button>
+            ) : (
+              <span>Build scoring poker lines across rows, columns, and diagonals.</span>
+            )}
+          </div>
 
-      <GameBoard
-        grid={game.grid}
-        scoring={game.scoring}
-        selectedCard={game.selectedCard}
-        highlight={game.highlight}
-        onCellClick={game.placeCard}
-        onCardClick={handleCardClick}
-        onLineClick={game.showLine}
-      />
+          <GameBoard
+            grid={game.grid}
+            scoring={game.scoring}
+            selectedCard={game.selectedCard}
+            highlight={game.highlight}
+            onCellClick={game.placeCard}
+            onCardClick={handleCardClick}
+            onLineClick={game.showLine}
+          />
+        </div>
 
-      <HandTray
-        hand={game.hand}
-        selectedCard={game.selectedCard}
-        onCardClick={handleCardClick}
-        onTrayClick={() => game.selectedCard?.type === 'grid' && game.placeCard({ type: 'hand' })}
-      />
+        <aside className="side-panel">
+          <div className="panel-score">
+            <span>Remaining</span>
+            <strong>{game.hand.length}</strong>
+          </div>
+          <HandTray
+            hand={game.hand}
+            selectedCard={game.selectedCard}
+            onCardClick={handleCardClick}
+            onCardDoubleClick={handleHandDoubleClick}
+            onTrayClick={() => game.selectedCard?.type === 'grid' && game.placeCard({ type: 'hand' })}
+          />
+        </aside>
+      </section>
 
       {game.isComplete && (
         <div className="modal-backdrop">

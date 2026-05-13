@@ -1,6 +1,6 @@
 import { Card } from './Card.jsx';
 
-export function HandTray({ hand, selectedCard, onCardClick, onTrayClick }) {
+export function HandTray({ hand, selectedCard, onCardClick, onCardDoubleClick, onTrayClick }) {
   return (
     <section className="hand-tray" onClick={onTrayClick} aria-label="Hand">
       {hand.length === 0 ? (
@@ -15,6 +15,10 @@ export function HandTray({ hand, selectedCard, onCardClick, onTrayClick }) {
                 onClick={(event) => {
                   event.stopPropagation();
                   onCardClick({ type: 'hand', index });
+                }}
+                onDoubleClick={(event) => {
+                  event.stopPropagation();
+                  onCardDoubleClick?.({ type: 'hand', index });
                 }}
               />
             </div>

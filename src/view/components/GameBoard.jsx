@@ -7,6 +7,17 @@ export function GameBoard({ grid, scoring, selectedCard, highlight, onCellClick,
   const columnLines = scoring.lines.filter((line) => line.type === 'column');
   const diagonalLines = scoring.lines.filter((line) => line.type === 'diagonal');
 
+  function handleCellKeyDown(event, card, row, column) {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+
+    if (card) {
+      onCardClick({ type: 'grid', row, column });
+    } else {
+      onCellClick({ type: 'grid', row, column });
+    }
+  }
+
   return (
     <section className="board-wrap" aria-label="Royal Tapestry board">
       <div className="diagonal-score-row">
@@ -30,8 +41,10 @@ export function GameBoard({ grid, scoring, selectedCard, highlight, onCellClick,
                   className={`board-cell ${isHighlighted ? 'cell-highlighted' : ''}`}
                   key={`${rowIndex}-${columnIndex}`}
                   onClick={() => (card ? onCardClick({ type: 'grid', row: rowIndex, column: columnIndex }) : onCellClick({ type: 'grid', row: rowIndex, column: columnIndex }))}
+                  onKeyDown={(event) => handleCellKeyDown(event, card, rowIndex, columnIndex)}
                   role="button"
                   tabIndex={0}
+                  aria-label={`Board cell ${rowIndex + 1}, ${columnIndex + 1}`}
                 >
                   <Card card={card} selected={isSelected} onClick={() => onCardClick({ type: 'grid', row: rowIndex, column: columnIndex })} />
                 </div>
