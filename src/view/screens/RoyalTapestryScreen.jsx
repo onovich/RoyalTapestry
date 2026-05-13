@@ -152,6 +152,7 @@ export function RoyalTapestryScreen() {
           <h1>{text.appName}</h1>
           <div className="toolbar">
             <button type="button" onClick={game.restart}>{text.newGame}</button>
+            <button type="button" onClick={game.undo} disabled={!game.canUndo}>{text.undo}</button>
             <button type="button" onClick={() => setRulesOpen(true)}>{text.rules}</button>
             <button type="button" onClick={game.surrender} disabled={game.surrendered}>{text.surrender}</button>
             <button type="button" className="language-toggle" onClick={toggleLanguage}>

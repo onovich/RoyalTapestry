@@ -15,6 +15,7 @@ export const TEXT = {
   en: {
     appName: '♥ Poker Grid',
     newGame: 'New Game',
+    undo: 'Undo',
     rules: '❓ Rules',
     surrender: 'Surrender',
     level: 'Level',
@@ -53,6 +54,7 @@ export const TEXT = {
   zh: {
     appName: '♥ 扑克方块',
     newGame: '重新开始',
+    undo: '撤销',
     rules: '❓ 规则',
     surrender: '投降',
     level: '关卡',
