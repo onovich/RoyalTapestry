@@ -575,6 +575,13 @@ button {
   gap: 0.55rem;
 }
 
+.rules-summary {
+  margin: -0.15rem 0 0.85rem;
+  color: #d1fae5;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
 .rule-row {
   display: grid;
   grid-template-columns: 3rem 1fr;

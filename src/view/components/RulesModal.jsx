@@ -16,6 +16,7 @@ export function RulesModal({ open, text, onClose }) {
             ✕
           </button>
         </header>
+        <p className="rules-summary">{text.howToPlay}</p>
         <div className="rules-list">
           {Object.values(HAND_SCORES).map((rule) => (
             <article className="rule-row" key={rule.id}>
