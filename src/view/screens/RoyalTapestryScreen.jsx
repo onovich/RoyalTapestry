@@ -23,19 +23,6 @@ export function RoyalTapestryScreen() {
     setLanguage((current) => (current === 'zh' ? 'en' : 'zh'));
   }
 
-  function formatCellName(cell) {
-    return formatText(text.cellName, { row: cell.row + 1, column: cell.column + 1 });
-  }
-
-  function formatHintNotice(hint) {
-    if (!hint) return text.hintNoMove;
-    return formatText(hint.delta > 0 ? text.hintMove : text.hintSetup, {
-      card: `${hint.sourceCard.rank}${hint.sourceCard.suit}`,
-      target: formatCellName(hint.target),
-      delta: hint.delta
-    });
-  }
-
   function handleCardClick(source) {
     if (suppressClickRef.current) {
       suppressClickRef.current = false;
@@ -162,7 +149,6 @@ export function RoyalTapestryScreen() {
           <div className="toolbar">
             <button type="button" onClick={game.restart}>{text.newGame}</button>
             <button type="button" onClick={() => setRulesOpen(true)}>{text.rules}</button>
-            <button type="button" onClick={game.requestHint}>{text.hint}</button>
             <button type="button" className="language-toggle" onClick={toggleLanguage}>
               {LANGUAGES[language === 'zh' ? 'en' : 'zh']}
             </button>
@@ -192,8 +178,6 @@ export function RoyalTapestryScreen() {
                 <span>✨ {text.hands[game.comboNotice.result.id].name}</span>
                 <strong className="combo-score-badge">+{game.comboNotice.result.score}</strong>
               </button>
-            ) : game.hintNotice !== null ? (
-              <span className="hint-message">{formatHintNotice(game.hintNotice)}</span>
             ) : game.selectedCard ? (
               <button type="button" onClick={game.clearSelection}>{text.selectDestination}</button>
             ) : game.hand.length === 0 && game.scoring.totalScore < game.targetScore ? (
@@ -208,7 +192,6 @@ export function RoyalTapestryScreen() {
             scoring={game.scoring}
             selectedCard={game.selectedCard}
             highlight={game.highlight}
-            hint={game.hintNotice}
             dragSource={dragInfo?.source}
             text={text}
             onCellClick={game.clearSelection}
@@ -226,7 +209,6 @@ export function RoyalTapestryScreen() {
           <HandTray
             hand={game.hand}
             selectedCard={game.selectedCard}
-            hint={game.hintNotice}
             dragSource={dragInfo?.source}
             text={text}
             onCardClick={handleCardClick}

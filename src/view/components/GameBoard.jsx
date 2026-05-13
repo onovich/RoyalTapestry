@@ -6,7 +6,6 @@ export function GameBoard({
   scoring,
   selectedCard,
   highlight,
-  hint,
   dragSource,
   text,
   onCellClick,
@@ -53,21 +52,10 @@ export function GameBoard({
                 && selectedCard.row === rowIndex
                 && selectedCard.column === columnIndex;
               const isHighlighted = highlightedCells.has(`${rowIndex}-${columnIndex}`);
-              const isHintSource = hint?.source?.type === 'grid'
-                && hint.source.row === rowIndex
-                && hint.source.column === columnIndex;
-              const isHintTarget = hint?.target?.type === 'grid'
-                && hint.target.row === rowIndex
-                && hint.target.column === columnIndex;
 
               return (
                 <div
-                  className={[
-                    'board-cell',
-                    isHighlighted ? 'cell-highlighted' : '',
-                    isHintSource ? 'hint-source' : '',
-                    isHintTarget ? 'hint-target' : ''
-                  ].join(' ')}
+                  className={`board-cell ${isHighlighted ? 'cell-highlighted' : ''}`}
                   data-drop-target="grid"
                   data-row={rowIndex}
                   data-column={columnIndex}

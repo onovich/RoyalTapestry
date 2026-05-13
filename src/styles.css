@@ -135,10 +135,6 @@ button {
   animation: status-pulse 1.2s ease-in-out infinite;
 }
 
-.hint-message {
-  color: #bfdbfe;
-}
-
 .play-area {
   flex: 1;
   min-height: 0;
@@ -255,23 +251,6 @@ button {
   outline: 0.2rem solid rgba(251, 191, 36, 0.72);
   outline-offset: 0.08rem;
   animation: combo-cell-flash 700ms ease-in-out 2;
-}
-
-.board-cell.hint-source,
-.board-cell.hint-target,
-.hand-card.hint-source .card {
-  outline: 0.2rem solid rgba(96, 165, 250, 0.88);
-  outline-offset: 0.08rem;
-  box-shadow: 0 0 1.2rem rgba(96, 165, 250, 0.42);
-}
-
-.board-cell.hint-target {
-  border-style: solid;
-  background: rgba(30, 64, 175, 0.36);
-}
-
-.hand-card.hint-source .card {
-  transform: translateY(-0.12rem);
 }
 
 .row-scores,
