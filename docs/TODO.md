@@ -42,6 +42,10 @@ Future design notes only. Do not implement yet.
 
 - Treat the game as a slow tabletop space rather than a high-pressure puzzle.
 - Atmosphere should support the card table, not compete with it.
+- Compare the saved minimal art directions in `docs/ART_DIRECTION.md` before a visual overhaul:
+  - `Quiet Desk` for the strongest cozy atmosphere and vinyl placement.
+  - `Modern Low Table` for the calmest pause-friendly mood.
+  - `App-Like Ritual` for the most implementable product UI structure.
 - Add a side vinyl record object as a low-key music controller.
 - The record may slowly spin while music is playing and ease to a stop when paused.
 - Consider channels such as rain night, dusk, lo-fi, jazz, tea room, or quiet ambient.
