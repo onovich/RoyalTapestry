@@ -12,6 +12,7 @@ export function RoyalTapestryScreen() {
   const [dragInfo, setDragInfo] = useState(null);
   const dragRef = useRef(null);
   const suppressClickRef = useRef(false);
+  const suppressClickTimerRef = useRef(null);
   const text = TEXT[language];
 
   useEffect(() => {
@@ -22,35 +23,21 @@ export function RoyalTapestryScreen() {
     setLanguage((current) => (current === 'zh' ? 'en' : 'zh'));
   }
 
-  function findFirstEmptyCell() {
-    for (let row = 0; row < game.grid.length; row += 1) {
-      for (let column = 0; column < game.grid[row].length; column += 1) {
-        if (!game.grid[row][column]) return { type: 'grid', row, column };
-      }
-    }
-
-    return null;
-  }
-
   function handleCardClick(source) {
     if (suppressClickRef.current) {
       suppressClickRef.current = false;
       return;
     }
 
-    if (game.selectedCard) {
-      game.placeCard(source);
-    } else if (source.type === 'grid' && game.confirmCellCombos(source.row, source.column)) {
+    if (source.type === 'grid' && game.confirmCellCombos(source.row, source.column)) {
       return;
-    } else {
-      game.selectCard(source);
     }
+
+    game.clearSelection();
   }
 
-  function handleHandDoubleClick(source) {
-    const target = findFirstEmptyCell();
-    if (!target) return;
-    game.moveDirectly(source, target);
+  function handleHandDoubleClick() {
+    game.clearSelection();
   }
 
   function getCardAtSource(source) {
@@ -126,8 +113,17 @@ export function RoyalTapestryScreen() {
 
     if (current.isDragging) {
       const target = resolveDropTarget(event);
-      if (target) game.moveDirectly(current.source, target);
+      if (target) {
+        game.moveDirectly(current.source, target);
+      } else if (current.source.type === 'grid') {
+        game.moveDirectly(current.source, { type: 'hand' });
+      }
       suppressClickRef.current = true;
+      if (suppressClickTimerRef.current) window.clearTimeout(suppressClickTimerRef.current);
+      suppressClickTimerRef.current = window.setTimeout(() => {
+        suppressClickRef.current = false;
+        suppressClickTimerRef.current = null;
+      }, 0);
     }
 
     dragRef.current = null;
@@ -198,7 +194,7 @@ export function RoyalTapestryScreen() {
             highlight={game.highlight}
             dragSource={dragInfo?.source}
             text={text}
-            onCellClick={game.placeCard}
+            onCellClick={game.clearSelection}
             onCardClick={handleCardClick}
             onCardPointerDown={handleCardPointerDown}
             onLineClick={game.showLine}
@@ -218,7 +214,7 @@ export function RoyalTapestryScreen() {
             onCardClick={handleCardClick}
             onCardDoubleClick={handleHandDoubleClick}
             onCardPointerDown={handleCardPointerDown}
-            onTrayClick={() => game.selectedCard?.type === 'grid' && game.placeCard({ type: 'hand' })}
+            onTrayClick={game.clearSelection}
           />
         </aside>
       </section>
