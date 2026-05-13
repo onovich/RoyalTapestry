@@ -1,10 +1,19 @@
 import { Card } from './Card.jsx';
 
-export function HandTray({ hand, selectedCard, dragSource, onCardClick, onCardDoubleClick, onCardPointerDown, onTrayClick }) {
+export function HandTray({
+  hand,
+  selectedCard,
+  dragSource,
+  text,
+  onCardClick,
+  onCardDoubleClick,
+  onCardPointerDown,
+  onTrayClick
+}) {
   return (
-    <section className="hand-tray" data-drop-target="hand" onClick={onTrayClick} aria-label="Hand">
+    <section className="hand-tray" data-drop-target="hand" onClick={onTrayClick} aria-label={text.handLabel}>
       {hand.length === 0 ? (
-        <div className="empty-hand">Hand is empty. Refine the board if the target is not met.</div>
+        <div className="empty-hand">{text.emptyHand}</div>
       ) : (
         <div className="hand-scroll">
           {hand.map((card, index) => (
@@ -13,6 +22,7 @@ export function HandTray({ hand, selectedCard, dragSource, onCardClick, onCardDo
                 card={card}
                 selected={selectedCard?.type === 'hand' && selectedCard.index === index}
                 muted={dragSource?.type === 'hand' && dragSource.index === index}
+                label={text.cardLabel.replace('{rank}', card.rank).replace('{suit}', card.suit)}
                 onClick={(event) => {
                   event.stopPropagation();
                   onCardClick({ type: 'hand', index });

@@ -488,6 +488,10 @@ button {
     min-width: 5.5rem;
   }
 
+  .toolbar .language-toggle {
+    min-width: 4.25rem;
+  }
+
   .score-strip {
     gap: 2rem;
   }

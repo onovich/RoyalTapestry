@@ -7,6 +7,7 @@ export function GameBoard({
   selectedCard,
   highlight,
   dragSource,
+  text,
   onCellClick,
   onCardClick,
   onCardPointerDown,
@@ -29,7 +30,7 @@ export function GameBoard({
   }
 
   return (
-    <section className="board-wrap" aria-label="Royal Tapestry board">
+    <section className="board-wrap" aria-label={text.boardLabel}>
       <div className="diagonal-score-row">
         {diagonalLines.map((line) => (
           <button key={line.id} className="score-pill diagonal-pill" type="button" onClick={() => onLineClick(line)}>
@@ -57,12 +58,13 @@ export function GameBoard({
                   onKeyDown={(event) => handleCellKeyDown(event, card, rowIndex, columnIndex)}
                   role="button"
                   tabIndex={0}
-                  aria-label={`Board cell ${rowIndex + 1}, ${columnIndex + 1}`}
+                  aria-label={text.boardCellLabel.replace('{row}', rowIndex + 1).replace('{column}', columnIndex + 1)}
                 >
                   <Card
                     card={card}
                     selected={isSelected}
                     muted={dragSource?.type === 'grid' && dragSource.row === rowIndex && dragSource.column === columnIndex}
+                    label={card ? text.cardLabel.replace('{rank}', card.rank).replace('{suit}', card.suit) : undefined}
                     onClick={() => onCardClick({ type: 'grid', row: rowIndex, column: columnIndex })}
                     onPointerDown={(event) => onCardPointerDown?.(event, { type: 'grid', row: rowIndex, column: columnIndex })}
                   />
@@ -75,7 +77,7 @@ export function GameBoard({
           {rowLines.map((line) => (
             <button key={line.id} className="line-score" type="button" onClick={() => onLineClick(line)}>
               <strong>{line.result.score}</strong>
-              <span>{line.result.score > 0 ? line.result.short : '-'}</span>
+              <span>{line.result.score > 0 ? text.hands[line.result.id].short : '-'}</span>
             </button>
           ))}
         </div>
@@ -84,7 +86,7 @@ export function GameBoard({
         {columnLines.map((line) => (
           <button key={line.id} className="line-score" type="button" onClick={() => onLineClick(line)}>
             <strong>{line.result.score}</strong>
-            <span>{line.result.score > 0 ? line.result.short : '-'}</span>
+            <span>{line.result.score > 0 ? text.hands[line.result.id].short : '-'}</span>
           </button>
         ))}
         <div style={{ width: '2.25rem' }} />

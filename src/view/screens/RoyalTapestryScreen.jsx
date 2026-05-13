@@ -1,4 +1,5 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { LANGUAGES, TEXT, formatText, getSystemLanguage } from '../../data/i18n.js';
 import { useRoyalTapestryGame } from '../../logic/hooks/useRoyalTapestryGame.js';
 import { GameBoard } from '../components/GameBoard.jsx';
 import { HandTray } from '../components/HandTray.jsx';
@@ -7,9 +8,19 @@ import { RulesModal } from '../components/RulesModal.jsx';
 export function RoyalTapestryScreen() {
   const game = useRoyalTapestryGame();
   const [rulesOpen, setRulesOpen] = useState(false);
+  const [language, setLanguage] = useState(getSystemLanguage);
   const [dragInfo, setDragInfo] = useState(null);
   const dragRef = useRef(null);
   const suppressClickRef = useRef(false);
+  const text = TEXT[language];
+
+  useEffect(() => {
+    document.documentElement.lang = language === 'zh' ? 'zh-CN' : 'en';
+  }, [language]);
+
+  function toggleLanguage() {
+    setLanguage((current) => (current === 'zh' ? 'en' : 'zh'));
+  }
 
   function findFirstEmptyCell() {
     for (let row = 0; row < game.grid.length; row += 1) {
@@ -136,23 +147,26 @@ export function RoyalTapestryScreen() {
     >
       <header className="topbar">
         <div>
-          <h1>Royal Tapestry</h1>
+          <h1>{text.appName}</h1>
           <div className="toolbar">
-            <button type="button" onClick={game.restart}>New</button>
-            <button type="button" onClick={() => setRulesOpen(true)}>Rules</button>
+            <button type="button" onClick={game.restart}>{text.newGame}</button>
+            <button type="button" onClick={() => setRulesOpen(true)}>{text.rules}</button>
+            <button type="button" className="language-toggle" onClick={toggleLanguage}>
+              {LANGUAGES[language === 'zh' ? 'en' : 'zh']}
+            </button>
           </div>
         </div>
         <div className="score-strip">
           <div>
-            <span>Level</span>
+            <span>{text.level}</span>
             <strong>{game.level}</strong>
           </div>
           <div>
-            <span>Target</span>
+            <span>{text.target}</span>
             <strong>{game.targetScore}</strong>
           </div>
           <div>
-            <span>Score</span>
+            <span>{text.score}</span>
             <strong>{game.scoring.totalScore}</strong>
           </div>
         </div>
@@ -163,12 +177,12 @@ export function RoyalTapestryScreen() {
           <div className="status-line">
             {game.highlight ? (
               <button type="button" onClick={game.clearSelection}>
-                {game.highlight.result.name} +{game.highlight.result.score}
+                {text.hands[game.highlight.result.id].name} +{game.highlight.result.score}
               </button>
             ) : game.selectedCard ? (
-              <button type="button" onClick={game.clearSelection}>Select a destination</button>
+              <button type="button" onClick={game.clearSelection}>{text.selectDestination}</button>
             ) : (
-              <span>Build scoring poker lines across rows, columns, and diagonals.</span>
+              <span>{text.statusDefault}</span>
             )}
           </div>
 
@@ -178,6 +192,7 @@ export function RoyalTapestryScreen() {
             selectedCard={game.selectedCard}
             highlight={game.highlight}
             dragSource={dragInfo?.source}
+            text={text}
             onCellClick={game.placeCard}
             onCardClick={handleCardClick}
             onCardPointerDown={handleCardPointerDown}
@@ -187,13 +202,14 @@ export function RoyalTapestryScreen() {
 
         <aside className="side-panel">
           <div className="panel-score">
-            <span>Remaining</span>
+            <span>{text.remaining}</span>
             <strong>{game.hand.length}</strong>
           </div>
           <HandTray
             hand={game.hand}
             selectedCard={game.selectedCard}
             dragSource={dragInfo?.source}
+            text={text}
             onCardClick={handleCardClick}
             onCardDoubleClick={handleHandDoubleClick}
             onCardPointerDown={handleCardPointerDown}
@@ -214,14 +230,14 @@ export function RoyalTapestryScreen() {
       {game.isComplete && (
         <div className="modal-backdrop">
           <section className="modal-panel win-panel">
-            <h2>Level Complete</h2>
-            <p>Your final score reached the target for level {game.level}.</p>
-            <button type="button" onClick={game.nextLevel}>Next Level</button>
+            <h2>{text.levelComplete}</h2>
+            <p>{formatText(text.levelCompleteBody, { level: game.level })}</p>
+            <button type="button" onClick={game.nextLevel}>{text.nextLevel}</button>
           </section>
         </div>
       )}
 
-      <RulesModal open={rulesOpen} onClose={() => setRulesOpen(false)} />
+      <RulesModal open={rulesOpen} text={text} onClose={() => setRulesOpen(false)} />
     </main>
   );
 }

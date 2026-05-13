@@ -1,14 +1,14 @@
 import { HAND_SCORES } from '../../data/cards.js';
 
-export function RulesModal({ open, onClose }) {
+export function RulesModal({ open, text, onClose }) {
   if (!open) return null;
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <section className="modal-panel" onClick={(event) => event.stopPropagation()} aria-label="Rules">
+      <section className="modal-panel" onClick={(event) => event.stopPropagation()} aria-label={text.rules}>
         <header className="modal-header">
-          <h2>Scoring</h2>
-          <button type="button" className="icon-button" onClick={onClose} aria-label="Close rules">
+          <h2>{text.scoring}</h2>
+          <button type="button" className="icon-button" onClick={onClose} aria-label={text.closeRules}>
             X
           </button>
         </header>
@@ -17,8 +17,8 @@ export function RulesModal({ open, onClose }) {
             <article className="rule-row" key={rule.id}>
               <strong>{rule.score}</strong>
               <div>
-                <h3>{rule.name}</h3>
-                <p>{rule.description}</p>
+                <h3>{text.hands[rule.id].name}</h3>
+                <p>{text.hands[rule.id].description}</p>
               </div>
             </article>
           ))}
