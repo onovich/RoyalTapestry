@@ -13,7 +13,7 @@ export function getSystemLanguage() {
 
 export const TEXT = {
   en: {
-    appName: '♥ Poker Grid',
+    appName: 'Royal Tapestry',
     newGame: 'New Game',
     undo: 'Undo',
     rules: '❓ Rules',
@@ -39,7 +39,7 @@ export const TEXT = {
     levelComplete: 'Level Complete',
     levelCompleteBody: 'You solved the theoretical target for level {level}.',
     nextLevel: 'Next Level',
-    boardLabel: 'Poker grid board',
+    boardLabel: 'Royal Tapestry board',
     handLabel: 'Hand',
     boardCellLabel: 'Board cell {row}, {column}',
     cardLabel: '{rank} of {suit}',
@@ -57,7 +57,7 @@ export const TEXT = {
     }
   },
   zh: {
-    appName: '♥ 扑克方块',
+    appName: '皇牌地毯',
     newGame: '重新开始',
     undo: '撤销',
     rules: '❓ 规则',
@@ -83,7 +83,7 @@ export const TEXT = {
     levelComplete: '恭喜过关！',
     levelCompleteBody: '您成功破解了第 {level} 关的理论最高分。',
     nextLevel: '进入下一关',
-    boardLabel: '扑克方块棋盘',
+    boardLabel: '皇牌地毯棋盘',
     handLabel: '手牌',
     boardCellLabel: '棋格 {row}，{column}',
     cardLabel: '{rank}{suit}',
