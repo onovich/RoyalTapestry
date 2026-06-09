@@ -61,6 +61,13 @@ export function sameRoundPosition(first, second) {
     && sameGrid(first.grid, second.grid);
 }
 
+export function sameSource(first, second) {
+  if (!first || !second || first.type !== second.type) return false;
+  if (first.type === 'hand') return first.index === second.index;
+  if (first.type === 'grid') return first.row === second.row && first.column === second.column;
+  return false;
+}
+
 export function getLockedCardIds(lockedLines) {
   const cardIds = new Set();
   lockedLines.forEach((line) => {

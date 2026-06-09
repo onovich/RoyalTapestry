@@ -1,11 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-
-export function sameSource(first, second) {
-  if (!first || !second || first.type !== second.type) return false;
-  if (first.type === 'hand') return first.index === second.index;
-  if (first.type === 'grid') return first.row === second.row && first.column === second.column;
-  return false;
-}
+import { sameSource } from '../engine/movement.js';
 
 export function getDragTransform(x, y) {
   return `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%) rotate(2deg)`;

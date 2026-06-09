@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "test": "node --test",
+    "validate": "npm test && npm run build",
+    "smoke": "node scripts/smoke-ui.mjs",
     "build": "vite build",
     "preview": "vite preview"
   },

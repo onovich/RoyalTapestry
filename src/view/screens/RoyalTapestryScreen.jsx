@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { LANGUAGES, TEXT, formatText, getSystemLanguage } from '../../data/i18n.js';
-import { sameSource, useCardDragAndDrop } from '../../logic/hooks/useCardDragAndDrop.js';
+import { useCardDragAndDrop } from '../../logic/hooks/useCardDragAndDrop.js';
+import { useCardPlacement } from '../../logic/hooks/useCardPlacement.js';
 import { useInteractionFeedback } from '../../logic/hooks/useInteractionFeedback.js';
 import { useRoyalTapestryGame } from '../../logic/hooks/useRoyalTapestryGame.js';
 import { GameBoard } from '../components/GameBoard.jsx';
@@ -34,6 +35,18 @@ export function RoyalTapestryScreen() {
     onSettle: showSettle,
     onLockedNudge: showLockedNudge
   });
+  const {
+    handleCardClick,
+    handleCellClick,
+    handleTrayClick,
+    handleHandDoubleClick
+  } = useCardPlacement({
+    game,
+    getCardAtSource,
+    consumeSuppressedClick,
+    showSettle,
+    showLockedNudge
+  });
 
   useEffect(() => {
     document.documentElement.lang = language === 'zh' ? 'zh-CN' : 'en';
@@ -41,67 +54,6 @@ export function RoyalTapestryScreen() {
 
   function toggleLanguage() {
     setLanguage((current) => (current === 'zh' ? 'en' : 'zh'));
-  }
-
-  function handleCardClick(source) {
-    if (game.surrendered) return;
-    if (game.isSourceLocked(source)) {
-      showLockedNudge(source);
-      return;
-    }
-
-    if (consumeSuppressedClick()) {
-      return;
-    }
-
-    if (game.selectedCard) {
-      if (sameSource(game.selectedCard, source)) {
-        game.clearSelection();
-        return;
-      }
-
-      const movedCard = getCardAtSource(game.selectedCard);
-      game.moveDirectly(game.selectedCard, source);
-      showSettle(movedCard);
-      return;
-    }
-
-    if (source.type === 'grid') {
-      game.confirmCellCombos(source.row, source.column);
-    }
-
-    game.selectCard(source);
-  }
-
-  function handleCellClick(target) {
-    if (game.surrendered) return;
-
-    if (game.selectedCard) {
-      const movedCard = getCardAtSource(game.selectedCard);
-      game.placeCard(target);
-      showSettle(movedCard);
-      return;
-    }
-
-    game.clearSelection();
-  }
-
-  function handleTrayClick() {
-    if (game.surrendered) return;
-
-    if (game.selectedCard?.type === 'grid') {
-      const movedCard = getCardAtSource(game.selectedCard);
-      game.placeCard({ type: 'hand' });
-      showSettle(movedCard);
-      return;
-    }
-
-    game.clearSelection();
-  }
-
-  function handleHandDoubleClick() {
-    if (game.surrendered) return;
-    game.clearSelection();
   }
 
   function getCardAtSource(source) {

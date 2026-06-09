@@ -5,7 +5,8 @@ import {
   getLockedCells,
   isGridSourceLocked,
   moveCard,
-  sameRoundPosition
+  sameRoundPosition,
+  sameSource
 } from '../src/logic/engine/movement.js';
 import { makeEmptyGrid } from '../src/logic/engine/scoring.js';
 
@@ -143,5 +144,19 @@ describe('locked movement helpers', () => {
 
     assert.equal(sameRoundPosition(first, second), true);
     assert.equal(sameRoundPosition(first, third), false);
+  });
+
+  it('compares hand and grid sources by their position fields', () => {
+    assert.equal(sameSource({ type: 'hand', index: 1 }, { type: 'hand', index: 1 }), true);
+    assert.equal(sameSource({ type: 'hand', index: 1 }, { type: 'hand', index: 2 }), false);
+    assert.equal(
+      sameSource({ type: 'grid', row: 1, column: 2 }, { type: 'grid', row: 1, column: 2 }),
+      true
+    );
+    assert.equal(
+      sameSource({ type: 'grid', row: 1, column: 2 }, { type: 'grid', row: 2, column: 1 }),
+      false
+    );
+    assert.equal(sameSource({ type: 'hand', index: 1 }, { type: 'grid', row: 0, column: 0 }), false);
   });
 });
