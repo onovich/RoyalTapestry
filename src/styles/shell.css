@@ -1,0 +1,140 @@
+.app-shell {
+  height: 100dvh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(245, 158, 11, 0.16), transparent 34rem),
+    linear-gradient(160deg, #063f3a 0%, #065f46 48%, #0f3b36 100%);
+}
+
+.app-shell.is-dragging,
+.app-shell.is-dragging * {
+  cursor: grabbing;
+}
+
+.topbar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem clamp(0.75rem, 3vw, 1.5rem);
+  border-bottom: 1px solid rgba(167, 243, 208, 0.18);
+  background: rgba(6, 78, 59, 0.92);
+  box-shadow: 0 0.5rem 1.75rem rgba(2, 6, 23, 0.22);
+}
+
+.topbar h1 {
+  margin: 0 0 0.45rem;
+  font-size: clamp(1.15rem, 3vw, 1.55rem);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.toolbar button,
+.status-line button,
+.win-panel button {
+  min-height: 2rem;
+  border: 1px solid rgba(167, 243, 208, 0.24);
+  border-radius: 0.45rem;
+  background: #047857;
+  color: #ecfdf5;
+  padding: 0.35rem 0.7rem;
+  cursor: pointer;
+}
+
+.toolbar button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.toolbar button:hover,
+.status-line button:hover,
+.win-panel button:hover,
+.icon-button:hover {
+  background: #059669;
+  border-color: rgba(252, 211, 77, 0.52);
+}
+
+.score-strip {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.55rem, 3vw, 1.5rem);
+}
+
+.score-strip div {
+  display: grid;
+  gap: 0.1rem;
+  text-align: center;
+}
+
+.score-strip span {
+  color: #a7f3d0;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+}
+
+.score-strip strong {
+  color: #fbbf24;
+  font-size: clamp(1.15rem, 4vw, 1.65rem);
+  line-height: 1;
+}
+
+.status-line {
+  min-height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  color: #d1fae5;
+  font-size: 0.86rem;
+  text-align: center;
+}
+
+.combo-notice {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: combo-pop 420ms ease-out;
+  box-shadow: 0 0 1rem rgba(251, 191, 36, 0.22);
+}
+
+.combo-score-badge {
+  color: #fbbf24;
+  font-size: 0.9em;
+}
+
+.need-adjust {
+  color: #fcd34d;
+  animation: status-pulse 1.2s ease-in-out infinite;
+}
+
+.surrender-message {
+  color: #fecaca;
+}
+
+.is-surrendered .board-cell,
+.is-surrendered .card,
+.is-surrendered .line-score,
+.is-surrendered .score-pill,
+.is-surrendered .hand-tray {
+  cursor: default;
+}
+
+.play-area {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.board-column {
+  min-height: 0;
+}

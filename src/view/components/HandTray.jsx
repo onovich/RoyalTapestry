@@ -5,6 +5,8 @@ export function HandTray({
   hand,
   selectedCard,
   dragSource,
+  dropTarget,
+  settledCardId,
   text,
   onCardClick,
   onCardDoubleClick,
@@ -37,14 +39,19 @@ export function HandTray({
   }
 
   return (
-    <section className="hand-tray" data-drop-target="hand" onClick={onTrayClick} aria-label={text.handLabel}>
+    <section
+      className={['hand-tray', dropTarget?.type === 'hand' ? 'tray-drop-target' : ''].join(' ')}
+      data-drop-target="hand"
+      onClick={onTrayClick}
+      aria-label={text.handLabel}
+    >
       {hand.length === 0 ? (
         <div className="empty-hand">{text.emptyHand}</div>
       ) : (
         <>
           <div className="hand-scroll" ref={scrollRef}>
             {hand.map((card, index) => (
-              <div className="hand-card" key={card.id}>
+              <div className={['hand-card', card.id === settledCardId ? 'card-settled' : ''].join(' ')} key={card.id}>
                 <Card
                   card={card}
                   selected={selectedCard?.type === 'hand' && selectedCard.index === index}

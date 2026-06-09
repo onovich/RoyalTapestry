@@ -1,0 +1,171 @@
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(2, 6, 23, 0.68);
+}
+
+.modal-panel {
+  width: min(92vw, 25rem);
+  max-height: 86dvh;
+  overflow: auto;
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  border-radius: 0.65rem;
+  background: #064e3b;
+  box-shadow: 0 1.5rem 3rem rgba(2, 6, 23, 0.45);
+  padding: 1rem;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.modal-header h2,
+.win-panel h2 {
+  margin: 0;
+}
+
+.modal-header h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #fef3c7;
+}
+
+.rule-suit {
+  font-size: 1.2em;
+  line-height: 1;
+}
+
+.rule-suit-diamond,
+.rule-suit-heart {
+  color: #ef4444;
+}
+
+.icon-button {
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid rgba(167, 243, 208, 0.24);
+  border-radius: 0.45rem;
+  background: rgba(2, 44, 34, 0.75);
+  color: #ecfdf5;
+  cursor: pointer;
+}
+
+.rules-list {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.rules-summary {
+  margin: -0.15rem 0 0.85rem;
+  color: #d1fae5;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.rule-row {
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  gap: 0.75rem;
+  padding: 0.65rem;
+  border: 1px solid rgba(167, 243, 208, 0.16);
+  border-radius: 0.5rem;
+  background: rgba(2, 44, 34, 0.45);
+}
+
+.rule-row strong {
+  display: grid;
+  place-items: center;
+  color: #fbbf24;
+  font-size: 1.15rem;
+}
+
+.rule-row strong small {
+  color: #a7f3d0;
+  font-size: 0.62rem;
+  font-weight: 700;
+}
+
+.rule-row h3,
+.rule-row p {
+  margin: 0;
+}
+
+.rule-row p {
+  margin-top: 0.15rem;
+  color: #a7f3d0;
+  font-size: 0.82rem;
+}
+
+.story-panel {
+  width: min(92vw, 28rem);
+}
+
+.story-text {
+  margin: 0;
+  color: #fef3c7;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  text-align: left;
+}
+
+.win-panel {
+  text-align: center;
+}
+
+.win-trophy {
+  margin-bottom: 0.75rem;
+  font-size: 3.8rem;
+  line-height: 1;
+}
+
+.win-panel h2 {
+  color: #fbbf24;
+  font-size: 1.65rem;
+}
+
+.win-panel p {
+  color: #d1fae5;
+  font-size: 0.9rem;
+}
+
+.win-score-box {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.35rem 0;
+  padding: 1rem;
+  border: 1px solid rgba(16, 185, 129, 0.26);
+  border-radius: 0.85rem;
+  background: rgba(2, 44, 34, 0.5);
+}
+
+.win-score-box div:not(.win-score-divider) {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.win-score-box span {
+  color: #6ee7b7;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+}
+
+.win-score-box strong {
+  color: #fbbf24;
+  font-size: 1.65rem;
+}
+
+.win-score-divider {
+  width: 1px;
+  height: 2.75rem;
+  background: rgba(16, 185, 129, 0.35);
+}

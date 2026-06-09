@@ -9,6 +9,9 @@ export function GameBoard({
   lockedLineIds,
   lockedCells,
   dragSource,
+  dropTarget,
+  settledCardId,
+  lockedNudge,
   text,
   onCellClick,
   onCardClick,
@@ -61,13 +64,21 @@ export function GameBoard({
                 && selectedCard.column === columnIndex;
               const isHighlighted = highlightedCells.has(`${rowIndex}-${columnIndex}`);
               const isLocked = lockedCells?.has(`${rowIndex}-${columnIndex}`);
+              const isDropTarget = dropTarget?.type === 'grid'
+                && dropTarget.row === rowIndex
+                && dropTarget.column === columnIndex;
+              const isSettled = card?.id === settledCardId;
+              const isLockedNudged = lockedNudge?.row === rowIndex && lockedNudge?.column === columnIndex;
 
               return (
                 <div
                   className={[
                     'board-cell',
                     isHighlighted ? 'cell-highlighted' : '',
-                    isLocked ? 'cell-locked' : ''
+                    isLocked ? 'cell-locked' : '',
+                    isDropTarget ? 'cell-drop-target' : '',
+                    isSettled ? 'cell-settled' : '',
+                    isLockedNudged ? 'cell-locked-nudge' : ''
                   ].join(' ')}
                   data-drop-target="grid"
                   data-row={rowIndex}

@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { BOARD_SIZE } from '../../data/cards.js';
 import { createDeck, shuffleArray } from '../engine/deck.js';
+import {
+  getLockedCardIds,
+  getLockedCells,
+  isGridSourceLocked,
+  moveCard,
+  sameRoundPosition
+} from '../engine/movement.js';
 import { findBestScoredGrid, getScoringLinesForCell, makeEmptyGrid, scoreGrid } from '../engine/scoring.js';
 
 function drawLevel() {
@@ -14,68 +21,6 @@ function drawLevel() {
     surrendered: false,
     lockedLines: []
   };
-}
-
-function moveCard({ source, target, hand, grid }) {
-  const nextHand = [...hand];
-  const nextGrid = grid.map((row) => [...row]);
-  const sourceCard = source.type === 'hand' ? nextHand[source.index] : nextGrid[source.row][source.column];
-  const targetCard = target.type === 'hand' && target.index !== undefined
-    ? nextHand[target.index]
-    : target.type === 'grid'
-      ? nextGrid[target.row][target.column]
-      : null;
-
-  if (!sourceCard) return { hand, grid };
-
-  if (source.type === 'hand' && target.type === 'grid') {
-    nextGrid[target.row][target.column] = sourceCard;
-    if (targetCard) {
-      nextHand[source.index] = targetCard;
-    } else {
-      nextHand.splice(source.index, 1);
-    }
-  }
-
-  if (source.type === 'grid' && target.type === 'grid') {
-    nextGrid[target.row][target.column] = sourceCard;
-    nextGrid[source.row][source.column] = targetCard;
-  }
-
-  if (source.type === 'grid' && target.type === 'hand') {
-    nextGrid[source.row][source.column] = null;
-    if (target.index !== undefined && targetCard) {
-      nextHand[target.index] = sourceCard;
-    } else {
-      nextHand.push(sourceCard);
-    }
-  }
-
-  if (source.type === 'hand' && target.type === 'hand' && target.index !== undefined) {
-    nextHand[source.index] = targetCard;
-    nextHand[target.index] = sourceCard;
-  }
-
-  return {
-    hand: nextHand.filter(Boolean),
-    grid: nextGrid
-  };
-}
-
-function sameCards(first, second) {
-  return first?.id === second?.id;
-}
-
-function sameGrid(first, second) {
-  return first.every((row, rowIndex) =>
-    row.every((card, columnIndex) => sameCards(card, second[rowIndex][columnIndex]))
-  );
-}
-
-function sameRoundPosition(first, second) {
-  return first.hand.length === second.hand.length
-    && first.hand.every((card, index) => sameCards(card, second.hand[index]))
-    && sameGrid(first.grid, second.grid);
 }
 
 export function useRoyalTapestryGame() {
@@ -92,22 +37,8 @@ export function useRoyalTapestryGame() {
   const skipScoreFeedbackRef = useRef(false);
   const scoring = useMemo(() => scoreGrid(round.grid), [round.grid]);
   const lockedLineIds = useMemo(() => new Set(round.lockedLines.map((line) => line.id)), [round.lockedLines]);
-  const lockedCardIds = useMemo(() => {
-    const cardIds = new Set();
-    round.lockedLines.forEach((line) => {
-      line.cardIds.forEach((id) => cardIds.add(id));
-    });
-    return cardIds;
-  }, [round.lockedLines]);
-  const lockedCells = useMemo(() => {
-    const cells = new Set();
-    round.grid.forEach((row, rowIndex) => {
-      row.forEach((card, columnIndex) => {
-        if (card && lockedCardIds.has(card.id)) cells.add(`${rowIndex}-${columnIndex}`);
-      });
-    });
-    return cells;
-  }, [round.grid, lockedCardIds]);
+  const lockedCardIds = useMemo(() => getLockedCardIds(round.lockedLines), [round.lockedLines]);
+  const lockedCells = useMemo(() => getLockedCells(round.grid, lockedCardIds), [round.grid, lockedCardIds]);
   const isComplete = !round.surrendered && round.hand.length === 0 && scoring.totalScore >= round.targetScore;
 
   function triggerComboFeedback(line, { resetCycle = false } = {}) {
@@ -182,17 +113,13 @@ export function useRoyalTapestryGame() {
   }
 
   function isSourceLocked(source) {
-    if (source?.type !== 'grid') return false;
-    const card = round.grid[source.row]?.[source.column];
-    return Boolean(card && lockedCardIds.has(card.id));
+    return isGridSourceLocked(round.grid, lockedCardIds, source);
   }
 
   function placeCard(target) {
     if (round.surrendered) return;
     if (!selectedCard) return;
-    const moved = moveCard({ source: selectedCard, target, hand: round.hand, grid: round.grid });
-    setRound((current) => ({ ...current, hand: moved.hand, grid: moved.grid }));
-    setSelectedCard(null);
+    moveDirectly(selectedCard, target);
   }
 
   function moveDirectly(source, target) {

@@ -1,5 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { LANGUAGES, TEXT, formatText, getSystemLanguage } from '../../data/i18n.js';
+import { sameSource, useCardDragAndDrop } from '../../logic/hooks/useCardDragAndDrop.js';
+import { useInteractionFeedback } from '../../logic/hooks/useInteractionFeedback.js';
 import { useRoyalTapestryGame } from '../../logic/hooks/useRoyalTapestryGame.js';
 import { GameBoard } from '../components/GameBoard.jsx';
 import { HandTray } from '../components/HandTray.jsx';
@@ -11,26 +13,31 @@ export function RoyalTapestryScreen() {
   const [rulesOpen, setRulesOpen] = useState(false);
   const [storyOpen, setStoryOpen] = useState(false);
   const [language, setLanguage] = useState(getSystemLanguage);
-  const [dragInfo, setDragInfo] = useState(null);
-  const dragRef = useRef(null);
-  const suppressClickRef = useRef(false);
-  const suppressClickTimerRef = useRef(null);
   const text = TEXT[language];
+  const { settledCardId, lockedNudge, showSettle, showLockedNudge } = useInteractionFeedback();
+  const {
+    dragInfo,
+    dragSource,
+    dropTarget,
+    dragGhostRef,
+    consumeSuppressedClick,
+    getDragTransform,
+    handleCardPointerDown,
+    handlePointerMove,
+    handlePointerUp,
+    handlePointerCancel
+  } = useCardDragAndDrop({
+    isSurrendered: game.surrendered,
+    isSourceLocked: game.isSourceLocked,
+    getCardAtSource,
+    moveDirectly: game.moveDirectly,
+    onSettle: showSettle,
+    onLockedNudge: showLockedNudge
+  });
 
   useEffect(() => {
     document.documentElement.lang = language === 'zh' ? 'zh-CN' : 'en';
   }, [language]);
-
-  useEffect(() => {
-    if (!dragInfo) return undefined;
-
-    const preventTouchMove = (event) => event.preventDefault();
-    document.addEventListener('touchmove', preventTouchMove, { passive: false });
-
-    return () => {
-      document.removeEventListener('touchmove', preventTouchMove);
-    };
-  }, [Boolean(dragInfo)]);
 
   function toggleLanguage() {
     setLanguage((current) => (current === 'zh' ? 'en' : 'zh'));
@@ -38,14 +45,54 @@ export function RoyalTapestryScreen() {
 
   function handleCardClick(source) {
     if (game.surrendered) return;
-    if (game.isSourceLocked(source)) return;
-
-    if (suppressClickRef.current) {
-      suppressClickRef.current = false;
+    if (game.isSourceLocked(source)) {
+      showLockedNudge(source);
       return;
     }
 
-    if (source.type === 'grid' && game.confirmCellCombos(source.row, source.column)) {
+    if (consumeSuppressedClick()) {
+      return;
+    }
+
+    if (game.selectedCard) {
+      if (sameSource(game.selectedCard, source)) {
+        game.clearSelection();
+        return;
+      }
+
+      const movedCard = getCardAtSource(game.selectedCard);
+      game.moveDirectly(game.selectedCard, source);
+      showSettle(movedCard);
+      return;
+    }
+
+    if (source.type === 'grid') {
+      game.confirmCellCombos(source.row, source.column);
+    }
+
+    game.selectCard(source);
+  }
+
+  function handleCellClick(target) {
+    if (game.surrendered) return;
+
+    if (game.selectedCard) {
+      const movedCard = getCardAtSource(game.selectedCard);
+      game.placeCard(target);
+      showSettle(movedCard);
+      return;
+    }
+
+    game.clearSelection();
+  }
+
+  function handleTrayClick() {
+    if (game.surrendered) return;
+
+    if (game.selectedCard?.type === 'grid') {
+      const movedCard = getCardAtSource(game.selectedCard);
+      game.placeCard({ type: 'hand' });
+      showSettle(movedCard);
       return;
     }
 
@@ -61,100 +108,6 @@ export function RoyalTapestryScreen() {
     if (source.type === 'hand') return game.hand[source.index];
     if (source.type === 'grid') return game.grid[source.row]?.[source.column];
     return null;
-  }
-
-  function handleCardPointerDown(event, source) {
-    if (game.surrendered) return;
-    if (game.isSourceLocked(source)) return;
-    if (event.button !== undefined && event.button !== 0) return;
-
-    event.preventDefault();
-    event.currentTarget.setPointerCapture?.(event.pointerId);
-
-    const card = getCardAtSource(source);
-    if (!card) return;
-
-    const nextDrag = {
-      source,
-      card,
-      startX: event.clientX,
-      startY: event.clientY,
-      x: event.clientX,
-      y: event.clientY,
-      isDragging: false
-    };
-
-    dragRef.current = nextDrag;
-    setDragInfo(nextDrag);
-  }
-
-  function updateDragInfo(nextDrag) {
-    dragRef.current = nextDrag;
-    setDragInfo(nextDrag);
-  }
-
-  function handlePointerMove(event) {
-    const current = dragRef.current;
-    if (!current) return;
-
-    const distanceX = event.clientX - current.startX;
-    const distanceY = event.clientY - current.startY;
-    const shouldDrag = current.isDragging || Math.hypot(distanceX, distanceY) > 6;
-    const nextDrag = {
-      ...current,
-      x: event.clientX,
-      y: event.clientY,
-      isDragging: shouldDrag
-    };
-
-    if (shouldDrag) event.preventDefault();
-    updateDragInfo(nextDrag);
-  }
-
-  function resolveDropTarget(event) {
-    const dropElement = document
-      .elementFromPoint(event.clientX, event.clientY)
-      ?.closest('[data-drop-target]');
-
-    if (!dropElement) return null;
-    if (dropElement.dataset.dropTarget === 'hand') return { type: 'hand' };
-    if (dropElement.dataset.dropTarget === 'grid') {
-      return {
-        type: 'grid',
-        row: Number(dropElement.dataset.row),
-        column: Number(dropElement.dataset.column)
-      };
-    }
-
-    return null;
-  }
-
-  function handlePointerUp(event) {
-    const current = dragRef.current;
-    if (!current) return;
-
-    if (current.isDragging) {
-      const target = resolveDropTarget(event);
-      if (target) {
-        game.moveDirectly(current.source, target);
-      } else if (current.source.type === 'grid') {
-        game.moveDirectly(current.source, { type: 'hand' });
-      }
-      suppressClickRef.current = true;
-      if (suppressClickTimerRef.current) window.clearTimeout(suppressClickTimerRef.current);
-      suppressClickTimerRef.current = window.setTimeout(() => {
-        suppressClickRef.current = false;
-        suppressClickTimerRef.current = null;
-      }, 0);
-    }
-
-    dragRef.current = null;
-    setDragInfo(null);
-  }
-
-  function handlePointerCancel() {
-    dragRef.current = null;
-    setDragInfo(null);
   }
 
   return (
@@ -221,9 +174,12 @@ export function RoyalTapestryScreen() {
             highlight={game.highlight}
             lockedLineIds={game.lockedLineIds}
             lockedCells={game.lockedCells}
-            dragSource={dragInfo?.source}
+            dragSource={dragSource}
+            dropTarget={dropTarget}
+            settledCardId={settledCardId}
+            lockedNudge={lockedNudge}
             text={text}
-            onCellClick={game.clearSelection}
+            onCellClick={handleCellClick}
             onCardClick={handleCardClick}
             onCardPointerDown={handleCardPointerDown}
             onLineClick={game.surrendered ? () => {} : game.toggleLineLock}
@@ -238,18 +194,24 @@ export function RoyalTapestryScreen() {
           <HandTray
             hand={game.hand}
             selectedCard={game.selectedCard}
-            dragSource={dragInfo?.source}
+            dragSource={dragSource}
+            dropTarget={dropTarget}
+            settledCardId={settledCardId}
             text={text}
             onCardClick={handleCardClick}
             onCardDoubleClick={handleHandDoubleClick}
             onCardPointerDown={handleCardPointerDown}
-            onTrayClick={game.clearSelection}
+            onTrayClick={handleTrayClick}
           />
         </aside>
       </section>
 
       {dragInfo?.isDragging && (
-        <div className="drag-ghost" style={{ left: dragInfo.x, top: dragInfo.y }}>
+        <div
+          className="drag-ghost"
+          ref={dragGhostRef}
+          style={{ transform: getDragTransform(dragInfo.x, dragInfo.y) }}
+        >
           <div className="drag-ghost-card">
             <span className="card-rank">{dragInfo.card.rank}</span>
             <span className="card-suit">{dragInfo.card.suit}</span>
