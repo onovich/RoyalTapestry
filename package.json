@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "arch-check": "node scripts/arch-check.mjs",
     "test": "node --test",
-    "validate": "npm test && npm run build",
+    "validate": "npm run arch-check && npm test && npm run build",
     "smoke": "node scripts/smoke-ui.mjs",
     "build": "vite build",
     "preview": "vite preview"

@@ -1,0 +1,18 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^(Bash|Shell|shell_command|functions\\.shell_command)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .codex/hooks/architecture-commit-guard.mjs",
+            "commandWindows": "node .codex\\hooks\\architecture-commit-guard.mjs",
+            "timeout": 20,
+            "statusMessage": "Royal Tapestry: architecture self-check before commit"
+          }
+        ]
+      }
+    ]
+  }
+}
